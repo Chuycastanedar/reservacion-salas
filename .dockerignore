@@ -1,0 +1,55 @@
+# Control de versiones y CI
+.git
+.gitignore
+.github
+
+# Docker (no se necesitan dentro de la imagen)
+Dockerfile
+compose*.yaml
+.dockerignore
+
+# Secretos y configuración local (las variables se inyectan con env_file)
+.env
+.env.*
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+env/
+
+# Django local
+db.sqlite3
+db.sqlite3-journal
+staticfiles/
+media/
+
+# Reportes y caché de pruebas
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Evidencias y rendimiento (JMeter se ejecuta desde el host)
+evidencias/
+jmeter/
+*.jtl
+
+# Logs
+*.log
+
+# Documentación
+README.md
+
+# IDE y sistema operativo
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

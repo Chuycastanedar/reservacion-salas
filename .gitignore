@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Entornos virtuales
+.venv/
+venv/
+env/
+
+# Configuración local y secretos (la plantilla .env.example sí se versiona)
+.env
+.env.*
+!.env.example
+local_settings.py
+
+# Django
+db.sqlite3
+db.sqlite3-journal
+staticfiles/
+media/
+
+# Pruebas y calidad: archivos temporales
+# (la evidencia entregable va en evidencias/, que SÍ se versiona)
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# JMeter: resultados crudos (el .jmx, los .csv parametrizados y el reporte HTML SÍ se versionan)
+*.jtl
+
+# Logs (incluye jmeter.log y geckodriver.log)
+*.log
+# Las evidencias en .log dentro de evidencias/ SÍ se versionan
+!evidencias/**/*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
