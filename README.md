@@ -110,7 +110,7 @@ docker compose exec web python manage.py test
 **Pruebas BDD, CA-01 a CA-11 (Behave + Selenium en modo headless):**
 
 ```bash
-docker compose exec web behave
+docker compose exec web python manage.py behave
 ```
 
 Los escenarios estarán en `features/`, organizados por historia de usuario: `reservaciones.feature` y `cancelaciones.feature`.
@@ -145,6 +145,7 @@ Se definirán en `.coveragerc` y solo se excluirán archivos sin lógica funcion
 - **Migraciones de esquema:** las genera Django automáticamente.
 - **Migración de datos de las salas:** la escribe el equipo, pero solo inserta los registros iniciales y no contiene lógica de negocio.
 - **`settings`, `wsgi`, `asgi` y `manage.py`:** archivos de configuración o arranque, siempre que no contengan lógica funcional.
+- **features/:** código de automatización BDD ejecutado por Behave y no lógica funcional.
 
 Los archivos con lógica funcional nunca se excluyen: se cubren al 100 %. Las exclusiones se limitan a los archivos sin lógica listados arriba, y cada una se justifica en esta sección.
 
