@@ -1,3 +1,1 @@
-from django.db import models
-
-# Create your models here.
+# Modelos de la app: se implementan guiados por pruebas (TDD).

@@ -1,3 +1,1 @@
-from django.shortcuts import render
-
-# Create your views here.
+# Vistas de la app: se implementan guiadas por pruebas (TDD).
