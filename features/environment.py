@@ -21,4 +21,6 @@ def before_all(context):
 
 
 def after_all(context):
-    context.browser.quit()
+    browser = getattr(context, "browser", None)
+    if browser is not None:
+        browser.quit()
