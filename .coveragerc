@@ -1,0 +1,13 @@
+[run]
+source = .
+omit =
+    */migrations/*
+    config/settings.py
+    config/wsgi.py
+    config/asgi.py
+    manage.py
+    features/*
+
+[report]
+show_missing = True
+fail_under = 100
