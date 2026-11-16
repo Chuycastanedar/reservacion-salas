@@ -1,5 +1,4 @@
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
 from django.shortcuts import render
 
 
@@ -10,4 +9,4 @@ def lista_reservaciones(request):
 
 @login_required
 def nueva_reservacion(request):
-    return HttpResponse()
+    return render(request, 'reservaciones/reservacion_form.html')
