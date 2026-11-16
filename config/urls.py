@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
-from django.urls import path
+from django.urls import include, path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -9,4 +9,5 @@ urlpatterns = [
         auth_views.LoginView.as_view(),
         name='login',
     ),
+    path('reservaciones/', include('reservaciones.urls')),
 ]
