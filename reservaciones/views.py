@@ -8,7 +8,16 @@ from .services import crear_reservacion
 
 @login_required
 def lista_reservaciones(request):
-    return render(request, 'reservaciones/lista_reservaciones.html')
+    reservaciones = (
+        request.user.reservaciones
+        .select_related('sala')
+        .order_by('fecha', 'hora_inicio')
+    )
+    return render(
+        request,
+        'reservaciones/lista_reservaciones.html',
+        {'reservaciones': reservaciones},
+    )
 
 
 @login_required
