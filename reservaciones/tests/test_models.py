@@ -46,3 +46,9 @@ class TestModels(TestCase):
 
     def test_return_object_sala(self):
         self.assertEqual(str(self.sala), 'Sala de prueba')
+
+    def test_return_object_reservacion(self):
+        self.reservacion.save()
+        self.assertEqual(
+            str(Reservacion.objects.first()),
+            'Sala de prueba · 2030-01-16 10:00-11:00 (VIGENTE)')
