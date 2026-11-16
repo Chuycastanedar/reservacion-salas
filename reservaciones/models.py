@@ -10,6 +10,10 @@ class Sala(models.Model):
 
 
 class Reservacion(models.Model):
+    class Estado(models.TextChoices):
+        VIGENTE = 'VIGENTE', 'Vigente'
+        CANCELADA = 'CANCELADA', 'Cancelada'
+
     usuario = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -25,6 +29,10 @@ class Reservacion(models.Model):
     hora_fin = models.TimeField()
     asistentes = models.IntegerField()
     proposito = models.CharField(max_length=200)
-    estado = models.CharField(max_length=20, default='VIGENTE')
+    estado = models.CharField(
+        max_length=20,
+        choices=Estado.choices,
+        default=Estado.VIGENTE,
+    )
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_cancelacion = models.DateTimeField(null=True, blank=True)
