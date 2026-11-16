@@ -4,4 +4,4 @@ Un registro por ciclo: prueba fallida, código mínimo, prueba exitosa y refacto
 
 | # | Fecha | Prueba (ID) | Comportamiento | Rojo (commit y evidencia) | Verde (commit y evidencia) | Refactorización |
 |---|-------|-------------|----------------|---------------------------|----------------------------|-----------------|
-| 1 |       | UT-01       |                |                           |                            |                 |
+| 1 | 2026-11-16 | UT-01a_modelo | Una reservación nueva queda en estado VIGENTE | `b76fe84` · `evidencias/tdd/UT-01a_modelo_rojo.txt` | `d2c0bd9` · `evidencias/tdd/UT-01a_modelo_verde.txt` | Sin refactorización |
