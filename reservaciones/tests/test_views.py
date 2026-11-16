@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
@@ -96,10 +98,54 @@ class TestViewsLista(TestCase):
         self.assertRedirects(
             response, '/reservaciones/', fetch_redirect_response=False)
 
+    def test_envio_datos_reservaciones(self):
+        usuario = self.inicia_sesion()
+        self.crea_reservacion(usuario)
+        response = self.client.get('/reservaciones/')
+        self.assertIn('reservaciones', response.context)
+        self.assertEqual(len(response.context['reservaciones']), 1)
+
+    def test_reservacion_propia_se_encuentra_en_el_template(self):
+        usuario = self.inicia_sesion()
+        self.crea_reservacion(usuario)
+        response = self.client.get('/reservaciones/')
+        self.assertContains(response, 'Sala de prueba')
+        contenido = response.content.decode()
+        inicio = contenido.index('id="tabla-reservaciones"')
+        tabla = contenido[inicio:contenido.index('</table>', inicio)]
+        self.assertIn('Sala de prueba', tabla)
+        self.assertIn('2030-01-16', tabla)
+        self.assertIn('10:00 - 11:00', tabla)
+        self.assertIn('VIGENTE', tabla)
+
+    def test_no_muestra_reservaciones_ajenas(self):
+        self.inicia_sesion()
+        otro = User.objects.create_user(
+            username='estudiante2', password='Prueba12345!')
+        self.crea_reservacion(otro)
+        response = self.client.get('/reservaciones/')
+        self.assertNotContains(response, 'Sala de prueba')
+        self.assertContains(
+            response, 'No tienes reservaciones registradas.')
+
     def inicia_sesion(self):
-        User.objects.create_user(
+        usuario = User.objects.create_user(
             username='estudiante1', password='Prueba12345!')
         self.client.login(username='estudiante1', password='Prueba12345!')
+        return usuario
+
+    def crea_reservacion(self, usuario):
+        sala = Sala.objects.create(
+            nombre='Sala de prueba', ubicacion='Edificio A', capacidad=4)
+        return Reservacion.objects.create(
+            usuario=usuario,
+            sala=sala,
+            fecha=datetime.date(2030, 1, 16),
+            hora_inicio=datetime.time(10, 0),
+            hora_fin=datetime.time(11, 0),
+            asistentes=3,
+            proposito='Estudio para el examen final',
+        )
 
 
 class TestViewsNuevaReservacion(TestCase):
