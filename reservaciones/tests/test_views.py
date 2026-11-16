@@ -116,3 +116,30 @@ class TestViewsNuevaReservacion(TestCase):
             response, '/cuentas/login/?next=/reservaciones/nueva/',
             fetch_redirect_response=False)
         self.assertEqual(Reservacion.objects.count(), 0)
+
+    def test_nueva_reservacion_response(self):
+        self.inicia_sesion()
+        response = self.client.get('/reservaciones/nueva/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_nombre_url_nueva_reservacion(self):
+        self.inicia_sesion()
+        response = self.client.get(reverse('nueva_reservacion'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_template_correcto_nueva_reservacion(self):
+        self.inicia_sesion()
+        response = self.client.get('/reservaciones/nueva/')
+        self.assertTemplateUsed(
+            response, 'reservaciones/reservacion_form.html')
+
+    def test_titulo_se_encuentra_en_el_template_nueva(self):
+        self.inicia_sesion()
+        response = self.client.get('/reservaciones/nueva/')
+        titulo = '<title>Nueva reservación</title>'
+        self.assertInHTML(titulo, response.content.decode())
+
+    def inicia_sesion(self):
+        self.usuario = User.objects.create_user(
+            username='estudiante1', password='Prueba12345!')
+        self.client.force_login(self.usuario)
