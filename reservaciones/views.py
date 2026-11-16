@@ -1,7 +1,8 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 
 from .forms import ReservacionForm
+from .services import crear_reservacion
 
 
 @login_required
@@ -11,6 +12,12 @@ def lista_reservaciones(request):
 
 @login_required
 def nueva_reservacion(request):
-    form = ReservacionForm()
+    if request.method == 'POST':
+        form = ReservacionForm(request.POST)
+        if form.is_valid():
+            crear_reservacion(usuario=request.user, **form.cleaned_data)
+            return redirect('lista_reservaciones')
+    else:
+        form = ReservacionForm()
     return render(
         request, 'reservaciones/reservacion_form.html', {'form': form})
