@@ -8,6 +8,9 @@ class Sala(models.Model):
     capacidad = models.PositiveIntegerField()
     activa = models.BooleanField(default=True)
 
+    def __str__(self):
+        return self.nombre
+
 
 class Reservacion(models.Model):
     class Estado(models.TextChoices):
