@@ -39,3 +39,10 @@ class Reservacion(models.Model):
     )
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_cancelacion = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return (
+            f'{self.sala} · {self.fecha:%Y-%m-%d} '
+            f'{self.hora_inicio:%H:%M}-{self.hora_fin:%H:%M} '
+            f'({self.estado})'
+        )
