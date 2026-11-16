@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
@@ -16,6 +17,8 @@ def nueva_reservacion(request):
         form = ReservacionForm(request.POST)
         if form.is_valid():
             crear_reservacion(usuario=request.user, **form.cleaned_data)
+            messages.success(
+                request, 'La reservación se registró correctamente.')
             return redirect('lista_reservaciones')
     else:
         form = ReservacionForm()

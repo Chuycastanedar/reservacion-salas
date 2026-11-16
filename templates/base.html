@@ -16,6 +16,13 @@
   </nav>
   {% endif %}
   <main>
+    {% if messages %}
+    <ul class="mensajes">
+      {% for mensaje in messages %}
+      <li>{{ mensaje }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
     {% block contenido %}{% endblock %}
   </main>
 </body>
