@@ -136,7 +136,7 @@ Las exclusiones (migraciones, entornos virtuales, evidencias) están centralizad
 **Complejidad ciclomática (cada función o método debe ser ≤ 10):**
 
 ```bash
-docker compose exec web radon cc . -s -a -x '*/migrations/*'
+docker compose exec web radon cc . -s -a -e '*/migrations/*'
 ```
 
 ### Exclusiones de cobertura
