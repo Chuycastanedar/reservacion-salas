@@ -9,5 +9,10 @@ urlpatterns = [
         auth_views.LoginView.as_view(),
         name='login',
     ),
+    path(
+        'cuentas/logout/',
+        auth_views.LogoutView.as_view(),
+        name='logout',
+    ),
     path('reservaciones/', include('reservaciones.urls')),
 ]

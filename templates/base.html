@@ -6,6 +6,14 @@
   <title>{% block titulo %}Reservación de salas{% endblock %}</title>
 </head>
 <body>
+  {% if user.is_authenticated %}
+  <nav>
+    <form method="post" action="{% url 'logout' %}">
+      {% csrf_token %}
+      <button type="submit" id="btn-cerrar-sesion">Cerrar sesión</button>
+    </form>
+  </nav>
+  {% endif %}
   <main>
     {% block contenido %}{% endblock %}
   </main>
