@@ -239,7 +239,7 @@ Y la sala vuelve a estar disponible para ese horario.
 
 ```gherkin
 Dado que existe una reservación vigente perteneciente a otro usuario
-Y el usuario autenticado intenta cancelarla
+Cuando el usuario autenticado intenta cancelarla
 Entonces el sistema rechaza la operación
 Y mantiene la reservación en estado "VIGENTE"
 Y responde sin revelar información sensible de la reservación.
