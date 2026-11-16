@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Reservacion
+from .models import Reservacion, Sala
 
 
 class ReservacionForm(forms.ModelForm):
@@ -22,3 +22,7 @@ class ReservacionForm(forms.ModelForm):
             'hora_fin': forms.TimeInput(
                 attrs={'type': 'time'}, format='%H:%M'),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['sala'].queryset = Sala.objects.filter(activa=True)
