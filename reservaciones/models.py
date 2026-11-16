@@ -25,6 +25,6 @@ class Reservacion(models.Model):
     hora_fin = models.TimeField()
     asistentes = models.IntegerField()
     proposito = models.CharField(max_length=200)
-    estado = models.CharField(max_length=20)
+    estado = models.CharField(max_length=20, default='VIGENTE')
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_cancelacion = models.DateTimeField(null=True, blank=True)
