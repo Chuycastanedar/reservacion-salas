@@ -89,6 +89,11 @@ class TestViewsLista(TestCase):
         self.assertContains(
             response, 'No tienes reservaciones registradas.')
 
+    def test_raiz_redirige_a_lista(self):
+        response = self.client.get('/')
+        self.assertRedirects(
+            response, '/reservaciones/', fetch_redirect_response=False)
+
     def inicia_sesion(self):
         User.objects.create_user(
             username='estudiante1', password='Prueba12345!')
