@@ -10,5 +10,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for nombre in USUARIOS:
-            if not User.objects.filter(username=nombre).exists():
-                User.objects.create_user(username=nombre, password=PASSWORD)
+            usuario, _ = User.objects.get_or_create(username=nombre)
+            usuario.set_password(PASSWORD)
+            usuario.save()
