@@ -20,3 +20,12 @@ class TestViewsAutenticacion(TestCase):
     def test_nombre_url_login_response(self):
         response = self.client.get(reverse('login'))
         self.assertEqual(response.status_code, 200)
+
+
+class TestViewsLista(TestCase):
+
+    def test_redirige_si_no_inicio_sesion_lista(self):
+        response = self.client.get('/reservaciones/')
+        self.assertRedirects(
+            response, '/cuentas/login/?next=/reservaciones/',
+            fetch_redirect_response=False)
