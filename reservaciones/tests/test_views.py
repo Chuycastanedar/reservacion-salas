@@ -32,6 +32,26 @@ class TestViewsAutenticacion(TestCase):
         response = self.client.post('/cuentas/login/', data=data_login)
         self.assertEqual(response.url, '/reservaciones/')
 
+    def test_boton_cerrar_sesion_en_template_base(self):
+        User.objects.create_user(
+            username='estudiante1', password='Prueba12345!')
+        self.client.login(username='estudiante1', password='Prueba12345!')
+        response = self.client.get('/reservaciones/')
+        contenido = response.content.decode()
+        self.assertIn('action="/cuentas/logout/"', contenido)
+        self.assertIn('csrfmiddlewaretoken', contenido)
+        self.assertInHTML(
+            '<button type="submit" id="btn-cerrar-sesion">'
+            'Cerrar sesión</button>', contenido)
+
+    def test_logout_redireccion(self):
+        User.objects.create_user(
+            username='estudiante1', password='Prueba12345!')
+        self.client.login(username='estudiante1', password='Prueba12345!')
+        response = self.client.post('/cuentas/logout/')
+        self.assertRedirects(
+            response, '/cuentas/login/', fetch_redirect_response=False)
+
 
 class TestViewsLista(TestCase):
 
