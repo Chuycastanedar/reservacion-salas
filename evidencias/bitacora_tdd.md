@@ -17,3 +17,4 @@ Un registro por ciclo: prueba fallida, código mínimo, prueba exitosa y refacto
 | 11 | 2026-11-16 | EXTRA-login-b_redireccion | Tras iniciar sesión se llega a la lista | `4f239a8` · `evidencias/tdd/EXTRA-login-b_redireccion_rojo.txt` | `dd559e6` · `evidencias/tdd/EXTRA-login-b_redireccion_verde.txt` | Sin refactorización |
 | 12 | 2026-11-16 | EXTRA-logout | Cerrar sesión por POST devuelve al inicio de sesión | `1c400ad` · `evidencias/tdd/EXTRA-logout_rojo.txt` | `c392fc2` · `evidencias/tdd/EXTRA-logout_verde.txt` | Sin refactorización |
 | 13 | 2026-11-16 | EXTRA-raiz-redirige | La raíz del sitio lleva a la lista | `908200f` · `evidencias/tdd/EXTRA-raiz-redirige_rojo.txt` | `87450d5` · `evidencias/tdd/EXTRA-raiz-redirige_verde.txt` | Sin refactorización |
+| 14 | 2026-11-16 | UT-11 | El formulario de nueva reservación exige sesión | `4029cf4` · `evidencias/tdd/UT-11_rojo.txt` | `57447e7` · `evidencias/tdd/UT-11_verde.txt` | Sin refactorización |
