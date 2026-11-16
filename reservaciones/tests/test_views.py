@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
-from reservaciones.models import Reservacion
+from reservaciones.models import Reservacion, Sala
 
 
 class TestViewsAutenticacion(TestCase):
@@ -104,6 +104,18 @@ class TestViewsLista(TestCase):
 
 class TestViewsNuevaReservacion(TestCase):
 
+    def setUp(self):
+        self.sala = Sala.objects.create(
+            nombre='Sala de prueba', ubicacion='Edificio A', capacidad=4)
+        self.data = {
+            'sala': self.sala.pk,
+            'fecha': '2030-01-16',
+            'hora_inicio': '10:00',
+            'hora_fin': '11:00',
+            'asistentes': 3,
+            'proposito': 'Estudio para el examen final',
+        }
+
     def test_redirige_si_no_inicio_sesion_nueva_reservacion(self):
         response = self.client.get('/reservaciones/nueva/')
         self.assertRedirects(
@@ -148,6 +160,20 @@ class TestViewsNuevaReservacion(TestCase):
         self.assertContains(response, 'csrfmiddlewaretoken')
         self.assertContains(response, 'name="proposito"')
         self.assertContains(response, 'id="btn-guardar"')
+
+    def test_agrega_reservacion_form(self):
+        self.inicia_sesion()
+        self.client.post('/reservaciones/nueva/', data=self.data)
+        self.assertEqual(Reservacion.objects.count(), 1)
+        reservacion = Reservacion.objects.first()
+        self.assertEqual(reservacion.usuario, self.usuario)
+        self.assertEqual(reservacion.estado, Reservacion.Estado.VIGENTE)
+
+    def test_redirige_despues_de_agregar_reservacion(self):
+        self.inicia_sesion()
+        response = self.client.post('/reservaciones/nueva/', data=self.data)
+        self.assertRedirects(
+            response, '/reservaciones/', fetch_redirect_response=False)
 
     def inicia_sesion(self):
         self.usuario = User.objects.create_user(
