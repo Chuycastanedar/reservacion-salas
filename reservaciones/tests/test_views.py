@@ -2,6 +2,8 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.urls import reverse
 
+from reservaciones.models import Reservacion
+
 
 class TestViewsAutenticacion(TestCase):
 
@@ -98,3 +100,19 @@ class TestViewsLista(TestCase):
         User.objects.create_user(
             username='estudiante1', password='Prueba12345!')
         self.client.login(username='estudiante1', password='Prueba12345!')
+
+
+class TestViewsNuevaReservacion(TestCase):
+
+    def test_redirige_si_no_inicio_sesion_nueva_reservacion(self):
+        response = self.client.get('/reservaciones/nueva/')
+        self.assertRedirects(
+            response, '/cuentas/login/?next=/reservaciones/nueva/',
+            fetch_redirect_response=False)
+
+    def test_post_anonimo_redirige_y_no_crea_reservacion(self):
+        response = self.client.post('/reservaciones/nueva/', data={})
+        self.assertRedirects(
+            response, '/cuentas/login/?next=/reservaciones/nueva/',
+            fetch_redirect_response=False)
+        self.assertEqual(Reservacion.objects.count(), 0)
