@@ -28,3 +28,12 @@ class TestFormReservacion(TestCase):
         for campo in ('sala', 'fecha', 'hora_inicio', 'hora_fin',
                       'asistentes', 'proposito'):
             self.assertIn(campo, form.errors)
+
+    def test_form_solo_ofrece_salas_activas(self):
+        inactiva = Sala.objects.create(
+            nombre='Sala inactiva', ubicacion='Edificio B', capacidad=4,
+            activa=False)
+        form = ReservacionForm()
+        queryset = form.fields['sala'].queryset
+        self.assertIn(self.sala, queryset)
+        self.assertNotIn(inactiva, queryset)
