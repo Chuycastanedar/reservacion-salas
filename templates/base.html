@@ -8,6 +8,7 @@
 <body>
   {% if user.is_authenticated %}
   <nav>
+    <a href="{% url 'nueva_reservacion' %}" id="enlace-nueva">Nueva reservación</a>
     <form method="post" action="{% url 'logout' %}">
       {% csrf_token %}
       <button type="submit" id="btn-cerrar-sesion">Cerrar sesión</button>
