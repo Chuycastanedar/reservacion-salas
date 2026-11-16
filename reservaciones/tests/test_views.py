@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.urls import reverse
 
 
 class TestViewsAutenticacion(TestCase):
@@ -15,3 +16,7 @@ class TestViewsAutenticacion(TestCase):
         response = self.client.get('/cuentas/login/')
         titulo = '<title>Inicio de sesión</title>'
         self.assertInHTML(titulo, response.content.decode())
+
+    def test_nombre_url_login_response(self):
+        response = self.client.get(reverse('login'))
+        self.assertEqual(response.status_code, 200)
