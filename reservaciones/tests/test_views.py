@@ -175,6 +175,13 @@ class TestViewsNuevaReservacion(TestCase):
         self.assertRedirects(
             response, '/reservaciones/', fetch_redirect_response=False)
 
+    def test_mensaje_de_exito_al_agregar_reservacion(self):
+        self.inicia_sesion()
+        response = self.client.post(
+            '/reservaciones/nueva/', data=self.data, follow=True)
+        self.assertContains(
+            response, 'La reservación se registró correctamente.')
+
     def inicia_sesion(self):
         self.usuario = User.objects.create_user(
             username='estudiante1', password='Prueba12345!')
