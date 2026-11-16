@@ -1,0 +1,66 @@
+Found 3 test(s).
+Creating test database for alias 'default' ('test_reservacion_salas')...
+Operations to perform:
+  Synchronize unmigrated apps: behave_django, messages, staticfiles
+  Apply all migrations: admin, auth, contenttypes, reservaciones, sessions
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying reservaciones.0001_initial... OK
+  Applying reservaciones.0002_alter_reservacion_estado... OK
+  Applying reservaciones.0003_alter_reservacion_estado... OK
+  Applying reservaciones.0004_salas_iniciales... OK
+  Applying sessions.0001_initial... OK
+System check identified no issues (0 silenced).
+test_login_response (reservaciones.tests.test_views.TestViewsAutenticacion.test_login_response) ... FAIL
+test_template_correcto_login (reservaciones.tests.test_views.TestViewsAutenticacion.test_template_correcto_login) ... FAIL
+test_titulo_se_encuentra_en_el_template_login (reservaciones.tests.test_views.TestViewsAutenticacion.test_titulo_se_encuentra_en_el_template_login) ... FAIL
+
+======================================================================
+FAIL: test_login_response (reservaciones.tests.test_views.TestViewsAutenticacion.test_login_response)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/app/reservaciones/tests/test_views.py", line 8, in test_login_response
+    self.assertEqual(response.status_code, 200)
+AssertionError: 404 != 200
+
+======================================================================
+FAIL: test_template_correcto_login (reservaciones.tests.test_views.TestViewsAutenticacion.test_template_correcto_login)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/app/reservaciones/tests/test_views.py", line 12, in test_template_correcto_login
+    self.assertTemplateUsed(response, 'registration/login.html')
+AssertionError: No templates used to render the response
+
+======================================================================
+FAIL: test_titulo_se_encuentra_en_el_template_login (reservaciones.tests.test_views.TestViewsAutenticacion.test_titulo_se_encuentra_en_el_template_login)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/app/reservaciones/tests/test_views.py", line 17, in test_titulo_se_encuentra_en_el_template_login
+    self.assertInHTML(titulo, response.content.decode())
+AssertionError: False is not true : Couldn't find '<title>Inicio de sesión</title>' in the following response
+'\n<!doctype html>\n<html lang="en">\n<head>\n  <title>Not Found</title>\n</head>\n<body>\n  <h1>Not Found</h1><p>The requested resource was not found on this server.</p>\n</body>\n</html>\n'
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.019s
+
+FAILED (failures=3)
+Destroying test database for alias 'default' ('test_reservacion_salas')...

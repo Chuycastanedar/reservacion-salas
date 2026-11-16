@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}Reservación de salas{% endblock %}</title>
+</head>
+<body>
+  {% if user.is_authenticated %}
+  <nav>
+    <form method="post" action="{% url 'logout' %}">
+      {% csrf_token %}
+      <button type="submit" id="btn-cerrar-sesion">Cerrar sesión</button>
+    </form>
+  </nav>
+  {% endif %}
+  <main>
+    {% block contenido %}{% endblock %}
+  </main>
+</body>
+</html>

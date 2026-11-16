@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block titulo %}Inicio de sesión{% endblock %}
+
+{% block contenido %}
+<h1>Inicio de sesión</h1>
+<form method="post" novalidate>
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" id="btn-iniciar-sesion">Iniciar sesión</button>
+</form>
+{% endblock %}
