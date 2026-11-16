@@ -22,6 +22,16 @@ class TestViewsAutenticacion(TestCase):
         response = self.client.get(reverse('login'))
         self.assertEqual(response.status_code, 200)
 
+    def test_redirige_despues_de_iniciar_sesion(self):
+        User.objects.create_user(
+            username='estudiante1', password='Prueba12345!')
+        data_login = {
+            'username': 'estudiante1',
+            'password': 'Prueba12345!',
+        }
+        response = self.client.post('/cuentas/login/', data=data_login)
+        self.assertEqual(response.url, '/reservaciones/')
+
 
 class TestViewsLista(TestCase):
 
