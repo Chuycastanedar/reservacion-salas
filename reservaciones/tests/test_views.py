@@ -139,6 +139,16 @@ class TestViewsNuevaReservacion(TestCase):
         titulo = '<title>Nueva reservación</title>'
         self.assertInHTML(titulo, response.content.decode())
 
+    def test_formulario_en_el_template(self):
+        self.inicia_sesion()
+        response = self.client.get('/reservaciones/nueva/')
+        self.assertIn('form', response.context)
+        self.assertContains(response, 'method="post"')
+        self.assertContains(response, 'novalidate')
+        self.assertContains(response, 'csrfmiddlewaretoken')
+        self.assertContains(response, 'name="proposito"')
+        self.assertContains(response, 'id="btn-guardar"')
+
     def inicia_sesion(self):
         self.usuario = User.objects.create_user(
             username='estudiante1', password='Prueba12345!')
