@@ -8,5 +8,6 @@ def lista_reservaciones(request):
     return render(request, 'reservaciones/lista_reservaciones.html')
 
 
+@login_required
 def nueva_reservacion(request):
     return HttpResponse()
