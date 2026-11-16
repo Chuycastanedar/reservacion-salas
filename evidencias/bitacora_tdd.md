@@ -19,3 +19,4 @@ Un registro por ciclo: prueba fallida, código mínimo, prueba exitosa y refacto
 | 13 | 2026-11-16 | EXTRA-raiz-redirige | La raíz del sitio lleva a la lista | `908200f` · `evidencias/tdd/EXTRA-raiz-redirige_rojo.txt` | `87450d5` · `evidencias/tdd/EXTRA-raiz-redirige_verde.txt` | Sin refactorización |
 | 14 | 2026-11-16 | UT-11 | El formulario de nueva reservación exige sesión | `4029cf4` · `evidencias/tdd/UT-11_rojo.txt` | `57447e7` · `evidencias/tdd/UT-11_verde.txt` | Sin refactorización |
 | 15 | 2026-11-16 | EXTRA-nueva-plantilla | El formulario se sirve con su plantilla y título | `c960abf` · `evidencias/tdd/EXTRA-nueva-plantilla_rojo.txt` | `09a740b` · `evidencias/tdd/EXTRA-nueva-plantilla_verde.txt` | Sin refactorización |
+| 16 | 2026-11-16 | EXTRA-form-campos | El formulario pide los seis campos y todos son obligatorios | `99bb2c3` · `evidencias/tdd/EXTRA-form-campos_rojo.txt` | `7295787` · `evidencias/tdd/EXTRA-form-campos_verde.txt` | Sin refactorización |
