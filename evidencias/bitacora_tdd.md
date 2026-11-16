@@ -6,3 +6,4 @@ Un registro por ciclo: prueba fallida, código mínimo, prueba exitosa y refacto
 |---|-------|-------------|----------------|---------------------------|----------------------------|-----------------|
 | 1 | 2026-11-16 | UT-01a_modelo | Una reservación nueva queda en estado VIGENTE | `b76fe84` · `evidencias/tdd/UT-01a_modelo_rojo.txt` | `d2c0bd9` · `evidencias/tdd/UT-01a_modelo_verde.txt` | Sin refactorización |
 | 2 | 2026-11-16 | EXTRA-reservacion-estados | Solo se permiten los estados VIGENTE y CANCELADA | `4f3c681` · `evidencias/tdd/EXTRA-reservacion-estados_rojo.txt` | `738169b` · `evidencias/tdd/EXTRA-reservacion-estados_verde.txt` | Sin refactorización |
+| 3 | 2026-11-16 | EXTRA-sala-str | str(sala) devuelve su nombre | `d65b492` · `evidencias/tdd/EXTRA-sala-str_rojo.txt` | `ed9fe24` · `evidencias/tdd/EXTRA-sala-str_verde.txt` | Sin refactorización |
