@@ -43,3 +43,6 @@ class TestModels(TestCase):
         self.reservacion.full_clean()
         self.reservacion.save()
         self.assertEqual(Reservacion.objects.first().estado, 'CANCELADA')
+
+    def test_return_object_sala(self):
+        self.assertEqual(str(self.sala), 'Sala de prueba')
