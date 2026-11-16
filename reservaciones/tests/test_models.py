@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from reservaciones.models import Reservacion, Sala
 import datetime
 
@@ -31,3 +32,14 @@ class TestModels(TestCase):
         self.assertEqual(guardada.estado, 'VIGENTE')
         self.assertIsNotNone(guardada.fecha_creacion)
         self.assertIsNone(guardada.fecha_cancelacion)
+
+    def test_estado_no_permitido(self):
+        self.reservacion.estado = 'PENDIENTE'
+        with self.assertRaises(ValidationError):
+            self.reservacion.full_clean()
+
+    def test_estado_cancelada_permitido(self):
+        self.reservacion.estado = 'CANCELADA'
+        self.reservacion.full_clean()
+        self.reservacion.save()
+        self.assertEqual(Reservacion.objects.first().estado, 'CANCELADA')
