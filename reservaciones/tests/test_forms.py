@@ -37,3 +37,20 @@ class TestFormReservacion(TestCase):
         queryset = form.fields['sala'].queryset
         self.assertIn(self.sala, queryset)
         self.assertNotIn(inactiva, queryset)
+
+    def test_asistentes_supera_capacidad(self):
+        self.data['asistentes'] = 5
+        form = ReservacionForm(self.data)
+        self.assertFalse(form.is_valid())
+
+    def test_asistentes_supera_capacidad_mensaje(self):
+        self.data['asistentes'] = 5
+        form = ReservacionForm(self.data)
+        self.assertEqual(form.errors['asistentes'], [
+                         'El número de asistentes supera la capacidad '
+                         'de la sala.'])
+
+    def test_asistentes_igual_a_capacidad_valido(self):
+        self.data['asistentes'] = 4
+        form = ReservacionForm(self.data)
+        self.assertTrue(form.is_valid())
