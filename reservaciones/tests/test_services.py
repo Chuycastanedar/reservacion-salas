@@ -233,5 +233,23 @@ class TestCancelarReservacion(RelojFijoMixin, TestCase):
         self.assertEqual(
             self.reservacion.estado, Reservacion.Estado.VIGENTE)
 
+    def test_rechaza_cancelacion_con_60_minutos_exactos(self):
+        ahora = self.inicio() - datetime.timedelta(minutes=60)
+        with self.assertRaises(ValidationError) as ctx:
+            cancelar_reservacion(self.reservacion, self.usuario, ahora=ahora)
+        self.assertEqual(
+            ctx.exception.messages,
+            ['El periodo de cancelación ha concluido.'])
+        self.reservacion.refresh_from_db()
+        self.assertEqual(
+            self.reservacion.estado, Reservacion.Estado.VIGENTE)
+
+    def test_cancela_con_61_minutos(self):
+        ahora = self.inicio() - datetime.timedelta(minutes=61)
+        cancelar_reservacion(self.reservacion, self.usuario, ahora=ahora)
+        self.reservacion.refresh_from_db()
+        self.assertEqual(
+            self.reservacion.estado, Reservacion.Estado.CANCELADA)
+
     def inicio(self):
         return datetime.datetime(2030, 1, 17, 10, 0, tzinfo=ZONA)
