@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from behave import given, then, when
+from django.contrib.auth.models import User
 from django.utils import timezone
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
@@ -8,6 +9,8 @@ from selenium.webdriver.support.ui import Select
 from features.paginas import (
     asignar_valor, llenar_texto, seleccionar_sala, texto_visible)
 from reservaciones.models import Reservacion, Sala
+
+PASSWORD = "Prueba12345!"
 
 PROPOSITO_VALIDO = "Estudio para el examen final"
 
@@ -48,6 +51,22 @@ def paso_sin_reservaciones(context, nombre):
         fecha=manana(),
         estado=Reservacion.Estado.VIGENTE,
     ).delete()
+
+
+@given('existe una reservación vigente de "{username}" para "{nombre}" '
+       'mañana de {inicio} a {fin}')
+def paso_reservacion_vigente(context, username, nombre, inicio, fin):
+    usuario = User.objects.create_user(username=username, password=PASSWORD)
+    Reservacion.objects.create(
+        usuario=usuario,
+        sala=Sala.objects.get(nombre=nombre),
+        fecha=manana(),
+        hora_inicio=inicio,
+        hora_fin=fin,
+        asistentes=2,
+        proposito=PROPOSITO_VALIDO,
+        estado=Reservacion.Estado.VIGENTE,
+    )
 
 
 @given('tiene abierto el formulario de nueva reservación')

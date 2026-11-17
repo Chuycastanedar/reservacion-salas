@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
 from django.shortcuts import redirect, render
 
 from .forms import ReservacionForm
@@ -25,10 +26,14 @@ def nueva_reservacion(request):
     if request.method == 'POST':
         form = ReservacionForm(request.POST)
         if form.is_valid():
-            crear_reservacion(usuario=request.user, **form.cleaned_data)
-            messages.success(
-                request, 'La reservación se registró correctamente.')
-            return redirect('lista_reservaciones')
+            try:
+                crear_reservacion(usuario=request.user, **form.cleaned_data)
+            except ValidationError as error:
+                form.add_error(None, error)
+            else:
+                messages.success(
+                    request, 'La reservación se registró correctamente.')
+                return redirect('lista_reservaciones')
     else:
         form = ReservacionForm()
     return render(
