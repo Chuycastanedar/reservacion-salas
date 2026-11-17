@@ -50,7 +50,7 @@ def cancelar_reservacion(reservacion, usuario, ahora=None):
     if reservacion.usuario_id != usuario.pk:
         raise PermissionDenied(MENSAJE_NO_PROPIETARIO)
     ahora = ahora or timezone.now()
-    if reservacion.inicio - ahora < ANTICIPACION_CANCELACION:
+    if reservacion.inicio - ahora <= ANTICIPACION_CANCELACION:
         raise ValidationError(MENSAJE_PERIODO_CONCLUIDO)
     reservacion.estado = Reservacion.Estado.CANCELADA
     reservacion.fecha_cancelacion = ahora
