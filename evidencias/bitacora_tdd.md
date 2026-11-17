@@ -39,3 +39,4 @@ Un registro por ciclo: prueba fallida, código mínimo, prueba exitosa y refacto
 | 33 | 2026-11-16 | UT-03a_cero | El formulario rechaza cero asistentes | `a14f8af` · `evidencias/tdd/UT-03a_cero_rojo.txt` | `667846f` · `evidencias/tdd/UT-03a_cero_verde.txt` | Sin refactorización |
 | 34 | 2026-11-16 | UT-03b_negativo | El formulario rechaza asistentes negativos (regla general: al menos 1) | `c4f6f4f` · `evidencias/tdd/UT-03b_negativo_rojo.txt` | `dd3e261` · `evidencias/tdd/UT-03b_negativo_verde.txt` | Sin refactorización |
 | 35 | 2026-11-16 | UT-03c_texto | Asistentes no numéricos muestran un mensaje propio | `4f74a45` · `evidencias/tdd/UT-03c_texto_rojo.txt` | `c35c4d8` · `evidencias/tdd/UT-03c_texto_verde.txt` | Sin refactorización |
+| 36 | 2026-11-16 | UT-07a_minima | El servicio no registra reservaciones de menos de 30 minutos | `a44d889` · `evidencias/tdd/UT-07a_minima_rojo.txt` | `76435c6` · `evidencias/tdd/UT-07a_minima_verde.txt` | Sin refactorización |
