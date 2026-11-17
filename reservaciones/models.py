@@ -62,6 +62,9 @@ class Reservacion(models.Model):
         return timezone.make_aware(
             datetime.datetime.combine(self.fecha, self.hora_inicio))
 
+    def puede_cancelarse(self, ahora=None):
+        return self.estado == self.Estado.VIGENTE
+
     # Reglas de dominio: (campo del error, validador, argumentos).
     REGLAS = (
         ('sala', validar_sala_activa, ('sala',)),
