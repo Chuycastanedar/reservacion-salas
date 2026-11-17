@@ -1,6 +1,7 @@
 import datetime
 
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from reservaciones.models import Reservacion, Sala
@@ -31,3 +32,9 @@ class TestCrearReservacion(TestCase):
         self.assertEqual(reservacion.usuario, self.usuario)
         self.assertEqual(reservacion.sala, self.sala)
         self.assertEqual(reservacion.estado, Reservacion.Estado.VIGENTE)
+
+    def test_no_registra_si_supera_capacidad(self):
+        self.datos['asistentes'] = 5
+        with self.assertRaises(ValidationError):
+            crear_reservacion(**self.datos)
+        self.assertEqual(Reservacion.objects.count(), 0)
