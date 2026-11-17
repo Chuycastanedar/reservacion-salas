@@ -1,0 +1,37 @@
+Found 119 test(s).
+Creating test database for alias 'default'...
+System check identified no issues (0 silenced).
+.......................................................................................................................
+----------------------------------------------------------------------
+Ran 119 tests in 141.908s
+
+OK
+Destroying test database for alias 'default'...
+Name                                                         Stmts   Miss  Cover   Missing
+------------------------------------------------------------------------------------------
+config/__init__.py                                               0      0   100%
+config/urls.py                                                   5      0   100%
+reservaciones/__init__.py                                        0      0   100%
+reservaciones/admin.py                                           0      0   100%
+reservaciones/apps.py                                            4      0   100%
+reservaciones/forms.py                                          11      0   100%
+reservaciones/management/__init__.py                             0      0   100%
+reservaciones/management/commands/__init__.py                    0      0   100%
+reservaciones/management/commands/crear_usuarios_prueba.py      11      0   100%
+reservaciones/models.py                                         58      0   100%
+reservaciones/services.py                                       31      0   100%
+reservaciones/tests/__init__.py                                  0      0   100%
+reservaciones/tests/test_commands.py                            19      0   100%
+reservaciones/tests/test_concurrencia.py                        36      0   100%
+reservaciones/tests/test_datos_iniciales.py                      7      0   100%
+reservaciones/tests/test_forms.py                              171      0   100%
+reservaciones/tests/test_integracion.py                         19      0   100%
+reservaciones/tests/test_models.py                              40      0   100%
+reservaciones/tests/test_services.py                           165      0   100%
+reservaciones/tests/test_views.py                              284      0   100%
+reservaciones/tests/utilidades.py                               25      0   100%
+reservaciones/urls.py                                            3      0   100%
+reservaciones/validators.py                                     41      0   100%
+reservaciones/views.py                                          37      0   100%
+------------------------------------------------------------------------------------------
+TOTAL                                                          967      0   100%
