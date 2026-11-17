@@ -51,19 +51,28 @@ class Reservacion(models.Model):
             f'({self.estado})'
         )
 
+    # Reglas de dominio: (campo del error, validador, argumentos).
+    REGLAS = (
+        ('fecha', validar_fecha_no_pasada, ('fecha',)),
+        ('hora_fin', validar_orden_horas, ('hora_inicio', 'hora_fin')),
+        ('asistentes', validar_capacidad, ('sala', 'asistentes')),
+    )
+
     def clean(self):
-        if self.fecha is not None:
+        errores = {}
+        for campo, validador, nombres in self.REGLAS:
+            argumentos = [self._valor_de(nombre) for nombre in nombres]
+            if None in argumentos:
+                continue
             try:
-                validar_fecha_no_pasada(self.fecha)
+                validador(*argumentos)
             except ValidationError as error:
-                raise ValidationError({'fecha': error})
-        if self.hora_inicio is not None and self.hora_fin is not None:
-            try:
-                validar_orden_horas(self.hora_inicio, self.hora_fin)
-            except ValidationError as error:
-                raise ValidationError({'hora_fin': error})
-        if self.sala_id is not None and self.asistentes is not None:
-            try:
-                validar_capacidad(self.sala, self.asistentes)
-            except ValidationError as error:
-                raise ValidationError({'asistentes': error})
+                errores.setdefault(campo, []).append(error)
+        if errores:
+            raise ValidationError(errores)
+
+    def _valor_de(self, nombre):
+        campo = self._meta.get_field(nombre)
+        if getattr(self, campo.attname) is None:
+            return None
+        return getattr(self, nombre)

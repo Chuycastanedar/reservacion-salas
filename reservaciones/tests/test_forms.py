@@ -92,3 +92,9 @@ class TestFormReservacion(RelojFijoMixin, TestCase):
         self.data['hora_fin'] = '10:00'
         form = ReservacionForm(self.data)
         self.assertFalse(form.is_valid())
+
+    def test_hora_fin_vacia_omite_reglas_de_horario(self):
+        self.data['hora_fin'] = ''
+        form = ReservacionForm(self.data)
+        self.assertEqual(form.errors['hora_fin'], [
+                         'Este campo es obligatorio.'])
