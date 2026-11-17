@@ -64,12 +64,17 @@ class Reservacion(models.Model):
         return timezone.make_aware(
             datetime.datetime.combine(self.fecha, self.hora_inicio))
 
-    def puede_cancelarse(self, ahora=None):
+    def esta_vigente(self):
+        """RN-10: solo una reservación VIGENTE puede cancelarse."""
+        return self.estado == self.Estado.VIGENTE
+
+    def en_periodo_de_cancelacion(self, ahora=None):
+        """RN-11: faltan más de 60 minutos para el inicio."""
         ahora = ahora or timezone.now()
-        return (
-            self.estado == self.Estado.VIGENTE
-            and self.inicio - ahora > ANTICIPACION_CANCELACION
-        )
+        return self.inicio - ahora > ANTICIPACION_CANCELACION
+
+    def puede_cancelarse(self, ahora=None):
+        return self.esta_vigente() and self.en_periodo_de_cancelacion(ahora)
 
     # Reglas de dominio: (campo del error, validador, argumentos).
     REGLAS = (
