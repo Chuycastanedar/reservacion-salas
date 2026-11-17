@@ -283,3 +283,31 @@ class TestViewsNuevaReservacion(RelojFijoMixin, TestCase):
             asistentes=2,
             proposito='Repaso de cálculo diferencial',
         )
+
+
+class TestViewsCancelar(RelojFijoMixin, TestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.usuario = User.objects.create_user(
+            username='estudiante1', password='Prueba12345!')
+        self.sala = Sala.objects.create(
+            nombre='Sala de prueba', ubicacion='Edificio A', capacidad=4)
+        self.reservacion = Reservacion.objects.create(
+            usuario=self.usuario,
+            sala=self.sala,
+            fecha=datetime.date(2030, 1, 17),
+            hora_inicio=datetime.time(10, 0),
+            hora_fin=datetime.time(11, 0),
+            asistentes=3,
+            proposito='Estudio para el examen final',
+        )
+        self.url = f'/reservaciones/{self.reservacion.pk}/cancelar/'
+
+    def test_redirige_si_no_inicio_sesion_cancelar(self):
+        response = self.client.post(self.url)
+        self.assertRedirects(
+            response, f'/cuentas/login/?next={self.url}',
+            fetch_redirect_response=False)
+        self.assertEqual(
+            Reservacion.objects.first().estado, Reservacion.Estado.VIGENTE)
