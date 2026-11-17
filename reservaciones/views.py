@@ -41,5 +41,6 @@ def nueva_reservacion(request):
         request, 'reservaciones/reservacion_form.html', {'form': form})
 
 
+@login_required
 def cancelar_reservacion(request, pk):
     return HttpResponse()
