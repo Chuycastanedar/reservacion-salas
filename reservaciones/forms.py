@@ -27,6 +27,10 @@ class ReservacionForm(forms.ModelForm):
                 'invalid_choice':
                     'La sala no se encuentra disponible para reservación.',
             },
+            'proposito': {
+                'max_length':
+                    'El propósito no puede exceder los 200 caracteres.',
+            },
         }
 
     def __init__(self, *args, **kwargs):

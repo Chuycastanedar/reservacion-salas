@@ -76,6 +76,7 @@ class Reservacion(models.Model):
 
     def _valor_de(self, nombre):
         campo = self._meta.get_field(nombre)
-        if getattr(self, campo.attname) is None:
+        # Ausente: None o cadena vacía (0 sí es un valor que se valida).
+        if getattr(self, campo.attname) in (None, ''):
             return None
         return getattr(self, nombre)
