@@ -1,5 +1,8 @@
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
+
+from .validators import validar_capacidad
 
 
 class Sala(models.Model):
@@ -46,3 +49,10 @@ class Reservacion(models.Model):
             f'{self.hora_inicio:%H:%M}-{self.hora_fin:%H:%M} '
             f'({self.estado})'
         )
+
+    def clean(self):
+        if self.sala_id is not None and self.asistentes is not None:
+            try:
+                validar_capacidad(self.sala, self.asistentes)
+            except ValidationError as error:
+                raise ValidationError({'asistentes': error})
