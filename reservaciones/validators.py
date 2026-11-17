@@ -29,6 +29,11 @@ def validar_hora_inicio(hora_inicio):
             'La hora de inicio debe estar entre las 08:00 y las 19:00.')
 
 
+def validar_hora_fin(hora_fin):
+    if hora_fin > HORA_CIERRE:
+        raise ValidationError('La hora de fin no puede exceder las 20:00.')
+
+
 def validar_orden_horas(hora_inicio, hora_fin):
     if hora_fin <= hora_inicio:
         raise ValidationError(
