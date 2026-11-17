@@ -128,3 +128,17 @@ class TestDisponibilidad(RelojFijoMixin, TestCase):
         self.datos['fecha'] = datetime.date(2030, 1, 17)
         crear_reservacion(**self.datos)
         self.assertEqual(Reservacion.objects.count(), 2)
+
+    def test_rechaza_traslape_parcial_al_final(self):
+        self.datos['hora_inicio'] = datetime.time(10, 30)
+        self.datos['hora_fin'] = datetime.time(11, 30)
+        with self.assertRaises(ValidationError):
+            crear_reservacion(**self.datos)
+        self.assertEqual(Reservacion.objects.count(), 1)
+
+    def test_rechaza_traslape_parcial_al_inicio(self):
+        self.datos['hora_inicio'] = datetime.time(9, 30)
+        self.datos['hora_fin'] = datetime.time(10, 30)
+        with self.assertRaises(ValidationError):
+            crear_reservacion(**self.datos)
+        self.assertEqual(Reservacion.objects.count(), 1)
