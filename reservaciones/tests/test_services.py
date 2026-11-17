@@ -146,13 +146,13 @@ class TestDisponibilidad(RelojFijoMixin, TestCase):
     def test_permite_horario_adyacente_posterior(self):
         self.datos['hora_inicio'] = datetime.time(11, 0)
         self.datos['hora_fin'] = datetime.time(12, 0)
-        self.registra_ignorando_rechazo()
+        crear_reservacion(**self.datos)
         self.assertEqual(self.cuenta_vigentes(), 2)
 
     def test_permite_horario_adyacente_anterior(self):
         self.datos['hora_inicio'] = datetime.time(9, 0)
         self.datos['hora_fin'] = datetime.time(10, 0)
-        self.registra_ignorando_rechazo()
+        crear_reservacion(**self.datos)
         self.assertEqual(self.cuenta_vigentes(), 2)
 
     def test_rechaza_traslape_que_contiene_a_la_existente(self):
@@ -172,17 +172,11 @@ class TestDisponibilidad(RelojFijoMixin, TestCase):
     def test_ignora_reservaciones_canceladas(self):
         self.existente.estado = Reservacion.Estado.CANCELADA
         self.existente.save()
-        self.registra_ignorando_rechazo()
+        crear_reservacion(**self.datos)
         self.assertEqual(self.cuenta_vigentes(), 1)
         self.assertEqual(
             Reservacion.objects.get(usuario=self.usuario).estado,
             Reservacion.Estado.VIGENTE)
-
-    def registra_ignorando_rechazo(self):
-        try:
-            crear_reservacion(**self.datos)
-        except ValidationError:
-            pass
 
     def cuenta_vigentes(self):
         return Reservacion.objects.filter(
