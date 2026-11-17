@@ -1,0 +1,19 @@
+Creating test database for alias 'default'...
+USING RUNNER: behave.runner:Runner
+Característica: Cancelación de reservaciones # features/cancelaciones.feature:2
+  Como usuario autenticado propietario de una reservación
+  Quiero cancelar una reservación que ya no utilizaré
+  Para liberar la sala y permitir que otro usuario pueda reservarla
+  Escenario: CA-09. Impedir cancelación fuera del periodo permitido                             # features/cancelaciones.feature:35
+    Dado que existe una sala activa "Sala BDD" con capacidad para 4 personas                    # features/steps/reservacion_steps.py:25
+    Y el usuario "estudiante1" ha iniciado sesión                                               # features/steps/autenticacion_steps.py:9
+    Y es propietario de una reservación vigente para "Sala BDD" que inicia dentro de 30 minutos # features/steps/cancelacion_steps.py:181
+    Cuando abre la cancelación de esa reservación y la confirma                                 # features/steps/cancelacion_steps.py:198
+    Entonces ve el mensaje "El periodo de cancelación ha concluido."                            # features/steps/reservacion_steps.py:203
+    Y su lista muestra la reservación de "Sala BDD" con estado "VIGENTE"                        # features/steps/reservacion_steps.py:210
+
+1 feature passed, 0 failed, 0 skipped
+1 scenario passed, 0 failed, 3 skipped
+6 steps passed, 0 failed, 22 skipped
+Took 0min 3.436s
+Destroying test database for alias 'default'...
