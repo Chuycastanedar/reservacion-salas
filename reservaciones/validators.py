@@ -18,3 +18,9 @@ def validar_orden_horas(hora_inicio, hora_fin):
     if hora_fin <= hora_inicio:
         raise ValidationError(
             'La hora de fin debe ser posterior a la hora de inicio.')
+
+
+def validar_sala_activa(sala):
+    if not sala.activa:
+        raise ValidationError(
+            'La sala no se encuentra disponible para reservación.')
