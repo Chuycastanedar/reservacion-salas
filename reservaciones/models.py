@@ -1,6 +1,9 @@
+import datetime
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
 
 from .validators import (
     validar_asistentes, validar_capacidad, validar_duracion,
@@ -52,6 +55,12 @@ class Reservacion(models.Model):
             f'{self.hora_inicio:%H:%M}-{self.hora_fin:%H:%M} '
             f'({self.estado})'
         )
+
+    @property
+    def inicio(self):
+        """Fecha y hora de inicio como datetime en la zona activa."""
+        return timezone.make_aware(
+            datetime.datetime.combine(self.fecha, self.hora_inicio))
 
     # Reglas de dominio: (campo del error, validador, argumentos).
     REGLAS = (

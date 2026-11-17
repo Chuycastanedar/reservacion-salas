@@ -1,3 +1,5 @@
+import datetime
+
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import transaction
 from django.utils import timezone
@@ -5,7 +7,10 @@ from django.utils import timezone
 from .models import Reservacion, Sala
 
 MENSAJE_NO_DISPONIBLE = 'La sala no está disponible en el horario solicitado.'
+MENSAJE_PERIODO_CONCLUIDO = 'El periodo de cancelación ha concluido.'
 MENSAJE_NO_PROPIETARIO = 'Solo el propietario puede cancelar la reservación.'
+
+ANTICIPACION_CANCELACION = datetime.timedelta(minutes=60)
 
 
 def existe_traslape(sala, fecha, hora_inicio, hora_fin):
@@ -44,7 +49,10 @@ def crear_reservacion(
 def cancelar_reservacion(reservacion, usuario, ahora=None):
     if reservacion.usuario_id != usuario.pk:
         raise PermissionDenied(MENSAJE_NO_PROPIETARIO)
+    ahora = ahora or timezone.now()
+    if reservacion.inicio - ahora < ANTICIPACION_CANCELACION:
+        raise ValidationError(MENSAJE_PERIODO_CONCLUIDO)
     reservacion.estado = Reservacion.Estado.CANCELADA
-    reservacion.fecha_cancelacion = ahora or timezone.now()
+    reservacion.fecha_cancelacion = ahora
     reservacion.save()
     return reservacion
