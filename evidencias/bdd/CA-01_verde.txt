@@ -1,0 +1,22 @@
+Creating test database for alias 'default'...
+USING RUNNER: behave.runner:Runner
+Característica: Registro de reservaciones de salas # features/reservaciones.feature:2
+  Como estudiante
+  Quiero reservar una sala de estudio
+  Para contar con un espacio en el horario que necesito
+  Escenario: CA-01. Registrar una reservación válida                               # features/reservaciones.feature:7
+    Dado que existe una sala activa "Sala BDD" con capacidad para 4 personas       # features/steps/reservacion_steps.py:16
+    Y el usuario "estudiante1" ha iniciado sesión                                  # features/steps/autenticacion_steps.py:9
+    Y no existe otra reservación vigente para "Sala BDD" mañana                    # features/steps/reservacion_steps.py:29
+    Cuando abre el formulario de nueva reservación                                 # features/steps/reservacion_steps.py:38
+    Y captura la sala "Sala BDD", la fecha de mañana y el horario de 10:00 a 11:00 # features/steps/reservacion_steps.py:45
+    Y captura 3 asistentes y el propósito "Estudio para el examen final"           # features/steps/reservacion_steps.py:55
+    Y envía el formulario                                                          # features/steps/reservacion_steps.py:61
+    Entonces ve el mensaje "La reservación se registró correctamente."             # features/steps/reservacion_steps.py:66
+    Y su lista muestra la reservación de "Sala BDD" con estado "VIGENTE"           # features/steps/reservacion_steps.py:73
+
+1 feature passed, 0 failed, 0 skipped
+1 scenario passed, 0 failed, 0 skipped
+9 steps passed, 0 failed, 0 skipped
+Took 0min 3.959s
+Destroying test database for alias 'default'...

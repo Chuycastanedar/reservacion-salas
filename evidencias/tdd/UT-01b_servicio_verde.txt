@@ -1,0 +1,71 @@
+Found 33 test(s).
+Creating test database for alias 'default' ('test_reservacion_salas')...
+Operations to perform:
+  Synchronize unmigrated apps: behave_django, messages, staticfiles
+  Apply all migrations: admin, auth, contenttypes, reservaciones, sessions
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying reservaciones.0001_initial... OK
+  Applying reservaciones.0002_alter_reservacion_estado... OK
+  Applying reservaciones.0003_alter_reservacion_estado... OK
+  Applying reservaciones.0004_salas_iniciales... OK
+  Applying sessions.0001_initial... OK
+System check identified no issues (0 silenced).
+test_crea_los_dos_usuarios (reservaciones.tests.test_commands.TestCrearUsuariosPrueba.test_crea_los_dos_usuarios) ... ok
+test_restablece_password_existente (reservaciones.tests.test_commands.TestCrearUsuariosPrueba.test_restablece_password_existente) ... ok
+test_salas_iniciales_cargadas (reservaciones.tests.test_datos_iniciales.TestSalasIniciales.test_salas_iniciales_cargadas) ... ok
+test_form_solo_ofrece_salas_activas (reservaciones.tests.test_forms.TestFormReservacion.test_form_solo_ofrece_salas_activas) ... ok
+test_form_vacio_es_invalido (reservaciones.tests.test_forms.TestFormReservacion.test_form_vacio_es_invalido) ... ok
+test_form_valido (reservaciones.tests.test_forms.TestFormReservacion.test_form_valido) ... ok
+test_estado_cancelada_permitido (reservaciones.tests.test_models.TestModels.test_estado_cancelada_permitido) ... ok
+test_estado_no_permitido (reservaciones.tests.test_models.TestModels.test_estado_no_permitido) ... ok
+test_reservacion_nueva_es_vigente (reservaciones.tests.test_models.TestModels.test_reservacion_nueva_es_vigente) ... ok
+test_return_object_reservacion (reservaciones.tests.test_models.TestModels.test_return_object_reservacion) ... ok
+test_return_object_sala (reservaciones.tests.test_models.TestModels.test_return_object_sala) ... ok
+test_crea_reservacion_valida (reservaciones.tests.test_services.TestCrearReservacion.test_crea_reservacion_valida) ... ok
+test_boton_cerrar_sesion_en_template_base (reservaciones.tests.test_views.TestViewsAutenticacion.test_boton_cerrar_sesion_en_template_base) ... ok
+test_login_response (reservaciones.tests.test_views.TestViewsAutenticacion.test_login_response) ... ok
+test_logout_redireccion (reservaciones.tests.test_views.TestViewsAutenticacion.test_logout_redireccion) ... ok
+test_nombre_url_login_response (reservaciones.tests.test_views.TestViewsAutenticacion.test_nombre_url_login_response) ... ok
+test_redirige_despues_de_iniciar_sesion (reservaciones.tests.test_views.TestViewsAutenticacion.test_redirige_despues_de_iniciar_sesion) ... ok
+test_template_correcto_login (reservaciones.tests.test_views.TestViewsAutenticacion.test_template_correcto_login) ... ok
+test_titulo_se_encuentra_en_el_template_login (reservaciones.tests.test_views.TestViewsAutenticacion.test_titulo_se_encuentra_en_el_template_login) ... ok
+test_lista_response (reservaciones.tests.test_views.TestViewsLista.test_lista_response) ... ok
+test_lista_vacia_muestra_aviso (reservaciones.tests.test_views.TestViewsLista.test_lista_vacia_muestra_aviso) ... ok
+test_nombre_url_lista (reservaciones.tests.test_views.TestViewsLista.test_nombre_url_lista) ... ok
+test_raiz_redirige_a_lista (reservaciones.tests.test_views.TestViewsLista.test_raiz_redirige_a_lista) ... ok
+test_redirige_si_no_inicio_sesion_lista (reservaciones.tests.test_views.TestViewsLista.test_redirige_si_no_inicio_sesion_lista) ... ok
+test_template_correcto_lista (reservaciones.tests.test_views.TestViewsLista.test_template_correcto_lista) ... ok
+test_titulo_se_encuentra_en_el_template_lista (reservaciones.tests.test_views.TestViewsLista.test_titulo_se_encuentra_en_el_template_lista) ... ok
+test_formulario_en_el_template (reservaciones.tests.test_views.TestViewsNuevaReservacion.test_formulario_en_el_template) ... ok
+test_nombre_url_nueva_reservacion (reservaciones.tests.test_views.TestViewsNuevaReservacion.test_nombre_url_nueva_reservacion) ... ok
+test_nueva_reservacion_response (reservaciones.tests.test_views.TestViewsNuevaReservacion.test_nueva_reservacion_response) ... ok
+test_post_anonimo_redirige_y_no_crea_reservacion (reservaciones.tests.test_views.TestViewsNuevaReservacion.test_post_anonimo_redirige_y_no_crea_reservacion) ... ok
+test_redirige_si_no_inicio_sesion_nueva_reservacion (reservaciones.tests.test_views.TestViewsNuevaReservacion.test_redirige_si_no_inicio_sesion_nueva_reservacion) ... ok
+test_template_correcto_nueva_reservacion (reservaciones.tests.test_views.TestViewsNuevaReservacion.test_template_correcto_nueva_reservacion) ... ok
+test_titulo_se_encuentra_en_el_template_nueva (reservaciones.tests.test_views.TestViewsNuevaReservacion.test_titulo_se_encuentra_en_el_template_nueva) ... ok
+
+----------------------------------------------------------------------
+Ran 33 tests in 45.433s
+
+OK
+Destroying test database for alias 'default' ('test_reservacion_salas')...
