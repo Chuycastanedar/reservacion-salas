@@ -47,3 +47,6 @@ def validar_duracion(hora_inicio, hora_fin):
     if 0 < duracion < 30:
         raise ValidationError(
             'La reservación debe durar al menos 30 minutos.')
+    if duracion > 120:
+        raise ValidationError(
+            'La reservación no puede durar más de 2 horas.')
