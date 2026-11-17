@@ -1,12 +1,12 @@
 import re
-from datetime import timedelta
+from datetime import datetime, time, timedelta
 
 from behave import given, then, when
 from django.utils import timezone
 from selenium.webdriver.common.by import By
 
 from features.paginas import (
-    capturar_formulario, fila_con_textos, texto_visible)
+    capturar_formulario, fecha_relativa, fila_con_textos, texto_visible)
 from reservaciones.models import Reservacion
 
 PROPOSITO_VALIDO = "Estudio para el examen final"
@@ -79,3 +79,45 @@ def paso_puede_registrar_mismo_horario(context, sala):
     assert mensaje in visible, (
         f"No se pudo registrar el mismo horario:\n{visible}")
     fila_con_textos(browser, sala, "VIGENTE")
+
+
+def instante_relativo(texto):
+    """Convierte "ayer 09:15" en un datetime local con zona."""
+    dia, hora = texto.split()
+    horas, minutos = (int(parte) for parte in hora.split(":"))
+    return timezone.make_aware(
+        datetime.combine(fecha_relativa(dia), time(horas, minutos)))
+
+
+@given('canceló {instante} una reservación suya para "{sala}"')
+def paso_reservacion_cancelada(context, instante, sala):
+    dia, _, hora = instante.partition(" a las ")
+    Reservacion.objects.create(
+        usuario=context.usuario,
+        sala=context.sala,
+        fecha=fecha_relativa(dia),
+        hora_inicio="10:00",
+        hora_fin="11:00",
+        asistentes=2,
+        proposito=PROPOSITO_VALIDO,
+        estado=Reservacion.Estado.CANCELADA,
+        fecha_cancelacion=instante_relativo(f"{dia} {hora}"),
+    )
+
+
+@when('consulta su historial')
+def paso_consulta_historial(context):
+    context.browser.get(context.get_url("/reservaciones/"))
+
+
+@then('observa la reservación de "{sala}" con estado "{estado}"')
+def paso_observa_reservacion(context, sala, estado):
+    fila_con_textos(context.browser, sala, estado)
+
+
+@then('puede identificar la fecha y hora de cancelación "{instante}"')
+def paso_identifica_fecha_de_cancelacion(context, instante):
+    esperado = instante_relativo(instante).strftime("%d/%m/%Y %H:%M")
+    fila = fila_con_textos(context.browser, context.sala.nombre, "CANCELADA")
+    assert esperado in fila.text, (
+        f"La fila no muestra la cancelación {esperado!r}:\n{fila.text}")
