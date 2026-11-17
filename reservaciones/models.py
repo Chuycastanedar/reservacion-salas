@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from .validators import validar_capacidad
+from .validators import validar_capacidad, validar_fecha_no_pasada
 
 
 class Sala(models.Model):
@@ -51,6 +51,11 @@ class Reservacion(models.Model):
         )
 
     def clean(self):
+        if self.fecha is not None:
+            try:
+                validar_fecha_no_pasada(self.fecha)
+            except ValidationError as error:
+                raise ValidationError({'fecha': error})
         if self.sala_id is not None and self.asistentes is not None:
             try:
                 validar_capacidad(self.sala, self.asistentes)
