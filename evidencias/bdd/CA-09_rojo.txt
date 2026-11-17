@@ -1,0 +1,31 @@
+Creating test database for alias 'default'...
+USING RUNNER: behave.runner:Runner
+Característica: Cancelación de reservaciones # features/cancelaciones.feature:2
+  Como usuario autenticado propietario de una reservación
+  Quiero cancelar una reservación que ya no utilizaré
+  Para liberar la sala y permitir que otro usuario pueda reservarla
+  Escenario: CA-09. Impedir cancelación fuera del periodo permitido                             # features/cancelaciones.feature:35
+    Dado que existe una sala activa "Sala BDD" con capacidad para 4 personas                    # features/steps/reservacion_steps.py:25
+    Y el usuario "estudiante1" ha iniciado sesión                                               # features/steps/autenticacion_steps.py:9
+    Y es propietario de una reservación vigente para "Sala BDD" que inicia dentro de 30 minutos # features/steps/cancelacion_steps.py:181
+    Cuando abre la cancelación de esa reservación y la confirma                                 # features/steps/cancelacion_steps.py:198
+    Entonces ve el mensaje "El periodo de cancelación ha concluido."                            # features/steps/reservacion_steps.py:203
+      ASSERT FAILED: No se encontró el mensaje 'El periodo de cancelación ha concluido.' en la página:
+      Nueva reservación
+      Cerrar sesión
+      La reservación se canceló correctamente.
+      Mis reservaciones
+      Sala Fecha Horario Estado Cancelada el Acciones
+      Sala BDD 2026-11-17 15:11 - 15:41 CANCELADA 17/11/2026 14:41 Cancelar
+
+    Y su lista muestra la reservación de "Sala BDD" con estado "VIGENTE"                        # None
+
+
+Failing scenarios:
+  features/cancelaciones.feature:35  CA-09. Impedir cancelación fuera del periodo permitido
+
+0 features passed, 1 failed, 0 skipped
+0 scenarios passed, 1 failed, 3 skipped
+4 steps passed, 1 failed, 23 skipped
+Took 0min 3.363s
+Destroying test database for alias 'default'...

@@ -176,3 +176,26 @@ def paso_propietario_ve_estado(context, username, estado):
     iniciar_sesion(context, username, PASSWORD)
     context.browser.get(context.get_url("/reservaciones/"))
     fila_con_textos(context.browser, context.sala.nombre, estado)
+
+
+@given('es propietario de una reservación vigente para "{sala}" '
+       'que inicia dentro de {minutos:d} minutos')
+def paso_reservacion_propia_proxima(context, sala, minutos):
+    inicio = (timezone.localtime() + timedelta(minutes=minutos)).replace(
+        second=0, microsecond=0)
+    context.reservacion = Reservacion.objects.create(
+        usuario=context.usuario,
+        sala=context.sala,
+        fecha=inicio.date(),
+        hora_inicio=inicio.time(),
+        hora_fin=(inicio + timedelta(minutes=30)).time(),
+        asistentes=2,
+        proposito=PROPOSITO_VALIDO,
+        estado=Reservacion.Estado.VIGENTE,
+    )
+
+
+@when('abre la cancelación de esa reservación y la confirma')
+def paso_abre_y_confirma_cancelacion(context):
+    paso_abre_url_de_cancelacion(context)
+    paso_confirma_cancelacion(context)

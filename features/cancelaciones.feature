@@ -31,3 +31,11 @@ Característica: Cancelación de reservaciones
     Entonces ve una página de recurso no encontrado
     Y la página no muestra el propósito "Asesoría confidencial de tesis"
     Y al iniciar sesión "estudiante2" su lista muestra la reservación con estado "VIGENTE"
+
+  Escenario: CA-09. Impedir cancelación fuera del periodo permitido
+    Dado que existe una sala activa "Sala BDD" con capacidad para 4 personas
+    Y el usuario "estudiante1" ha iniciado sesión
+    Y es propietario de una reservación vigente para "Sala BDD" que inicia dentro de 30 minutos
+    Cuando abre la cancelación de esa reservación y la confirma
+    Entonces ve el mensaje "El periodo de cancelación ha concluido."
+    Y su lista muestra la reservación de "Sala BDD" con estado "VIGENTE"
