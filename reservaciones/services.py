@@ -1,7 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.db import transaction
 
-from .models import Reservacion
+from .models import Reservacion, Sala
 
 MENSAJE_NO_DISPONIBLE = 'La sala no está disponible en el horario solicitado.'
 
@@ -19,17 +19,20 @@ def existe_traslape(sala, fecha, hora_inicio, hora_fin):
 
 def crear_reservacion(
         usuario, sala, fecha, hora_inicio, hora_fin, asistentes, proposito):
-    reservacion = Reservacion(
-        usuario=usuario,
-        sala=sala,
-        fecha=fecha,
-        hora_inicio=hora_inicio,
-        hora_fin=hora_fin,
-        asistentes=asistentes,
-        proposito=proposito.strip(),
-    )
-    reservacion.full_clean()
     with transaction.atomic():
+        # RN-08: bloquea la fila de la sala; una solicitud concurrente para
+        # la misma sala espera aquí hasta que esta transacción termine.
+        sala = Sala.objects.select_for_update().get(pk=sala.pk)
+        reservacion = Reservacion(
+            usuario=usuario,
+            sala=sala,
+            fecha=fecha,
+            hora_inicio=hora_inicio,
+            hora_fin=hora_fin,
+            asistentes=asistentes,
+            proposito=proposito.strip(),
+        )
+        reservacion.full_clean()
         if existe_traslape(sala, fecha, hora_inicio, hora_fin):
             raise ValidationError(MENSAJE_NO_DISPONIBLE)
         reservacion.save()
