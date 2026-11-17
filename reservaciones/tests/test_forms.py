@@ -226,3 +226,22 @@ class TestFormReservacion(RelojFijoMixin, TestCase):
         self.data['hora_fin'] = '20:00'
         form = ReservacionForm(self.data)
         self.assertTrue(form.is_valid())
+
+    def test_hora_fin_despues_de_cierre(self):
+        self.data['hora_inicio'] = '19:00'
+        self.data['hora_fin'] = '20:01'
+        form = ReservacionForm(self.data)
+        self.assertFalse(form.is_valid())
+
+    def test_hora_fin_despues_de_cierre_mensaje(self):
+        self.data['hora_inicio'] = '19:00'
+        self.data['hora_fin'] = '20:01'
+        form = ReservacionForm(self.data)
+        self.assertEqual(form.errors['hora_fin'], [
+                         'La hora de fin no puede exceder las 20:00.'])
+
+    def test_hora_fin_20_00_valida(self):
+        self.data['hora_inicio'] = '19:00'
+        self.data['hora_fin'] = '20:00'
+        form = ReservacionForm(self.data)
+        self.assertTrue(form.is_valid())
