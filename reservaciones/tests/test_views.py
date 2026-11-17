@@ -230,7 +230,35 @@ class TestViewsNuevaReservacion(RelojFijoMixin, TestCase):
         self.assertContains(
             response, 'La reservación se registró correctamente.')
 
+    def test_no_agrega_reservacion_traslapada(self):
+        self.inicia_sesion()
+        self.crea_reservacion_existente()
+        self.client.raise_request_exception = False
+        self.data['hora_inicio'] = '10:30'
+        self.data['hora_fin'] = '11:30'
+        response = self.client.post('/reservaciones/nueva/', data=self.data)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response, 'La sala no está disponible en el horario solicitado.')
+        self.assertEqual(Reservacion.objects.count(), 1)
+        self.assertEqual(
+            response.context['form'].data['proposito'],
+            'Estudio para el examen final')
+
     def inicia_sesion(self):
         self.usuario = User.objects.create_user(
             username='estudiante1', password='Prueba12345!')
         self.client.force_login(self.usuario)
+
+    def crea_reservacion_existente(self):
+        otro_usuario = User.objects.create_user(
+            username='estudiante2', password='Prueba12345!')
+        Reservacion.objects.create(
+            usuario=otro_usuario,
+            sala=self.sala,
+            fecha=datetime.date(2030, 1, 16),
+            hora_inicio=datetime.time(10, 0),
+            hora_fin=datetime.time(11, 0),
+            asistentes=2,
+            proposito='Repaso de cálculo diferencial',
+        )
