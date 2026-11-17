@@ -6,7 +6,7 @@ from django.test import TestCase
 
 from reservaciones.models import Reservacion, Sala
 from reservaciones.services import cancelar_reservacion, crear_reservacion
-from reservaciones.tests.utilidades import AHORA, RelojFijoMixin
+from reservaciones.tests.utilidades import AHORA, ZONA, RelojFijoMixin
 
 
 class TestCrearReservacion(RelojFijoMixin, TestCase):
@@ -221,3 +221,17 @@ class TestCancelarReservacion(RelojFijoMixin, TestCase):
         self.reservacion.refresh_from_db()
         self.assertEqual(
             self.reservacion.estado, Reservacion.Estado.VIGENTE)
+
+    def test_rechaza_cancelacion_con_menos_de_60_minutos(self):
+        ahora = self.inicio() - datetime.timedelta(minutes=59)
+        with self.assertRaises(ValidationError) as ctx:
+            cancelar_reservacion(self.reservacion, self.usuario, ahora=ahora)
+        self.assertEqual(
+            ctx.exception.messages,
+            ['El periodo de cancelación ha concluido.'])
+        self.reservacion.refresh_from_db()
+        self.assertEqual(
+            self.reservacion.estado, Reservacion.Estado.VIGENTE)
+
+    def inicio(self):
+        return datetime.datetime(2030, 1, 17, 10, 0, tzinfo=ZONA)
