@@ -1,13 +1,15 @@
+import threading
 from datetime import timedelta
 
 from behave import given, then, when
 from django.contrib.auth.models import User
 from django.utils import timezone
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
 
 from features.paginas import (
-    asignar_valor, llenar_texto, seleccionar_sala, texto_visible)
+    asignar_valor, esperar, llenar_texto, seleccionar_sala, texto_visible)
 from reservaciones.models import Reservacion, Sala
 
 PASSWORD = "Prueba12345!"
@@ -109,14 +111,17 @@ def registrar_reservacion(context, sala, fecha, inicio, fin, asistentes,
     }
     if abrir:
         paso_abre_formulario(context)
-    browser = context.browser
-    seleccionar_sala(browser, sala)
     context.capturado["sala"] = sala
-    for campo in ("fecha", "hora_inicio", "hora_fin"):
-        asignar_valor(browser, f"id_{campo}", context.capturado[campo])
-    for campo in ("asistentes", "proposito"):
-        llenar_texto(browser, f"id_{campo}", context.capturado[campo])
+    capturar_formulario(context.browser, context.capturado)
     paso_envia_formulario(context)
+
+
+def capturar_formulario(browser, datos):
+    seleccionar_sala(browser, datos["sala"])
+    for campo in ("fecha", "hora_inicio", "hora_fin"):
+        asignar_valor(browser, f"id_{campo}", datos[campo])
+    for campo in ("asistentes", "proposito"):
+        llenar_texto(browser, f"id_{campo}", datos[campo])
 
 
 @when('intenta registrar una reservación válida para "{sala}" '
@@ -137,6 +142,76 @@ def paso_intenta_registrar_en_formulario_abierto(context, sala):
 def paso_intenta_registrar_con_horario(context, sala, fecha, inicio, fin):
     registrar_reservacion(
         context, sala, fecha_relativa(fecha), inicio, fin, 3)
+
+
+@given('ambos tienen capturada la misma reservación para "{sala}" '
+       'mañana de {inicio} a {fin}')
+def paso_ambos_capturan(context, sala, inicio, fin):
+    datos = {
+        "sala": sala,
+        "fecha": manana().isoformat(),
+        "hora_inicio": inicio,
+        "hora_fin": fin,
+        "asistentes": "3",
+        "proposito": PROPOSITO_VALIDO,
+    }
+    context.navegadores = [context.browser, context.browser2]
+    for browser in context.navegadores:
+        browser.get(context.get_url("/reservaciones/nueva/"))
+        capturar_formulario(browser, datos)
+
+
+@when('ambos envían el formulario al mismo tiempo')
+def paso_ambos_envian(context):
+    salida = threading.Barrier(len(context.navegadores))
+    errores = []
+
+    def enviar(browser):
+        try:
+            boton = browser.find_element(By.ID, "btn-guardar")
+            salida.wait()
+            boton.click()
+            esperar(browser, EC.staleness_of(boton))
+        except Exception as error:  # se reporta tras unir los hilos
+            errores.append(error)
+
+    hilos = [threading.Thread(target=enviar, args=(browser,))
+             for browser in context.navegadores]
+    for hilo in hilos:
+        hilo.start()
+    for hilo in hilos:
+        hilo.join()
+    assert not errores, f"Falló el envío concurrente: {errores!r}"
+
+
+@then('solo uno de los dos ve el mensaje "{mensaje}"')
+def paso_solo_uno_ve_mensaje(context, mensaje):
+    textos = [texto_visible(b) for b in context.navegadores]
+    con_mensaje = [i for i, texto in enumerate(textos) if mensaje in texto]
+    assert len(con_mensaje) == 1, (
+        f"{len(con_mensaje)} navegadores muestran {mensaje!r}:\n"
+        + "\n---\n".join(textos))
+    context.otro = context.navegadores[1 - con_mensaje[0]]
+
+
+@then('el otro ve el mensaje "{mensaje}"')
+def paso_el_otro_ve_mensaje(context, mensaje):
+    visible = texto_visible(context.otro)
+    assert mensaje in visible, (
+        f"No se encontró el mensaje {mensaje!r} en la página:\n{visible}")
+
+
+@then('entre las dos listas hay exactamente una reservación '
+      'con estado "{estado}"')
+def paso_una_reservacion_entre_listas(context, estado):
+    total = 0
+    for browser in context.navegadores:
+        browser.get(context.get_url("/reservaciones/"))
+        for tabla in browser.find_elements(By.ID, "tabla-reservaciones"):
+            filas = tabla.find_elements(By.TAG_NAME, "tr")
+            total += sum(estado in fila.text for fila in filas)
+    assert total == 1, (
+        f"Se encontraron {total} reservaciones con estado {estado!r}")
 
 
 @then('ve el mensaje "{mensaje}"')

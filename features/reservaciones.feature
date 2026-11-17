@@ -51,3 +51,14 @@ Característica: Registro de reservaciones de salas
     Cuando intenta registrar una reservación para "Sala BDD" con fecha "mañana" de 10:30 a 11:30
     Entonces ve el mensaje "La sala no está disponible en el horario solicitado."
     Y su lista no muestra ninguna reservación
+
+  @concurrencia
+  Escenario: CA-06. Evitar una doble reservación ante solicitudes concurrentes
+    Dado que existe una sala activa "Sala BDD" con capacidad para 4 personas
+    Y el usuario "estudiante1" ha iniciado sesión
+    Y el usuario "estudiante2" ha iniciado sesión en un segundo navegador
+    Y ambos tienen capturada la misma reservación para "Sala BDD" mañana de 10:00 a 11:00
+    Cuando ambos envían el formulario al mismo tiempo
+    Entonces solo uno de los dos ve el mensaje "La reservación se registró correctamente."
+    Y el otro ve el mensaje "La sala no está disponible en el horario solicitado."
+    Y entre las dos listas hay exactamente una reservación con estado "VIGENTE"
