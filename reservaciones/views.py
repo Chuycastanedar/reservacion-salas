@@ -44,7 +44,8 @@ def nueva_reservacion(request):
 
 @login_required
 def cancelar_reservacion(request, pk):
-    reservacion = get_object_or_404(Reservacion, pk=pk)
+    reservacion = get_object_or_404(
+        Reservacion, pk=pk, usuario=request.user)
     if request.method == 'POST':
         services.cancelar_reservacion(reservacion, request.user)
         messages.success(request, 'La reservación se canceló correctamente.')

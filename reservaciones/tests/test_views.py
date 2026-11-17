@@ -389,4 +389,3 @@ class TestViewsCancelar(RelojFijoMixin, TestCase):
             asistentes=2,
             proposito='Asesoría confidencial de tesis',
         )
-
