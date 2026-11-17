@@ -158,6 +158,18 @@ class TestViewsLista(RelojFijoMixin, TestCase):
             'class="enlace-cancelar">Cancelar</a>',
             response.content.decode())
 
+    def test_no_muestra_boton_cancelar_en_cancelada(self):
+        usuario = self.inicia_sesion()
+        reservacion = self.crea_reservacion(
+            usuario,
+            estado=Reservacion.Estado.CANCELADA,
+            fecha_cancelacion=datetime.datetime(
+                2030, 1, 14, 9, 15, tzinfo=ZONA),
+        )
+        response = self.client.get('/reservaciones/')
+        self.assertNotContains(
+            response, f'/reservaciones/{reservacion.pk}/cancelar/')
+
     def inicia_sesion(self):
         usuario = User.objects.create_user(
             username='estudiante1', password='Prueba12345!')
