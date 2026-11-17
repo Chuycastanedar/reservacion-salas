@@ -33,6 +33,6 @@ def validar_proposito(proposito):
 
 
 def validar_asistentes(asistentes):
-    if asistentes == 0:
+    if asistentes < 1:
         raise ValidationError(
             'El número de asistentes debe ser mayor o igual a 1.')
