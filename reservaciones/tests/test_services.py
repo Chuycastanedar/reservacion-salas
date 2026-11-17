@@ -50,3 +50,10 @@ class TestCrearReservacion(RelojFijoMixin, TestCase):
                          'La sala no se encuentra disponible para '
                          'reservación.'])
         self.assertEqual(Reservacion.objects.count(), 0)
+
+    def test_guarda_proposito_sin_espacios_extremos(self):
+        self.datos['proposito'] = '  Estudio para el examen final  '
+        crear_reservacion(**self.datos)
+        self.assertEqual(
+            Reservacion.objects.first().proposito,
+            'Estudio para el examen final')
