@@ -27,6 +27,6 @@ def validar_sala_activa(sala):
 
 
 def validar_proposito(proposito):
-    if len(proposito) < 10:
+    if len(proposito.strip()) < 10:
         raise ValidationError(
             'El propósito debe tener al menos 10 caracteres.')

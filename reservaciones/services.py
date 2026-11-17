@@ -10,7 +10,7 @@ def crear_reservacion(
         hora_inicio=hora_inicio,
         hora_fin=hora_fin,
         asistentes=asistentes,
-        proposito=proposito,
+        proposito=proposito.strip(),
     )
     reservacion.full_clean()
     reservacion.save()
