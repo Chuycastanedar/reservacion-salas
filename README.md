@@ -1,16 +1,14 @@
 # Sistema de reservación de salas de estudio
 
-*Proyecto en desarrollo. Este README describe el alcance y la configuración previstos, que se incorporarán progresivamente.*
-
-Aplicación web hecha con Django para consultar salas de estudio y reservarlas. Un usuario autenticado podrá registrar una reservación y cancelarla después si cumple las reglas. El proyecto se desarrollará mediante TDD y BDD, y el historial de commits deberá reflejarlo.
+Aplicación web hecha con Django para consultar salas de estudio y reservarlas. Un usuario autenticado registra una reservación y puede cancelarla después si cumple las reglas. El proyecto se desarrolló mediante TDD y BDD, y el historial de commits lo refleja.
 
 Actividad de la materia de *Pruebas y mantenimiento de software* (Ingeniería de Software).
 
-## Qué hará
+## Qué hace
 
-**HU-01. Registrar una reservación.** El usuario elegirá una sala activa, fecha, hora de inicio, hora de fin, número de asistentes y propósito. Si algo no cumple las reglas, no se guardará nada, se conservarán los datos capturados y se mostrarán mensajes específicos.
+**HU-01. Registrar una reservación.** El usuario elige una sala activa, fecha, hora de inicio, hora de fin, número de asistentes y propósito. Si algo no cumple las reglas, no se guarda nada, se conservan los datos capturados y se muestran mensajes específicos.
 
-**HU-02. Cancelar una reservación.** Solo el propietario podrá cancelar una reservación vigente, y solo si faltan más de 60 minutos para su inicio. La reservación no se eliminará: quedará como `CANCELADA`, con su fecha de cancelación, y dejará de bloquear la sala.
+**HU-02. Cancelar una reservación.** Solo el propietario puede cancelar una reservación vigente, y solo si faltan más de 60 minutos para su inicio. La reservación no se elimina: queda como `CANCELADA`, con su fecha de cancelación, y deja de bloquear la sala. La lista del usuario muestra su historial (vigentes y canceladas).
 
 Reglas principales:
 
@@ -48,8 +46,8 @@ La actividad exige Python y Django; PostgreSQL y Docker son decisiones de arquit
 1. Clona el repositorio y entra a la carpeta:
 
    ```bash
-   git clone <url-del-repositorio>
-   cd <carpeta-del-repositorio>
+   git clone https://github.com/Chuycastanedar/reservacion-salas.git
+   cd reservacion-salas
    ```
 
 2. Crea tu archivo de variables de entorno y ajusta los valores (al menos la clave secreta y la contraseña de la base de datos):
@@ -58,13 +56,13 @@ La actividad exige Python y Django; PostgreSQL y Docker son decisiones de arquit
    cp .env.example .env
    ```
 
-3. Construye y levanta los servicios (aplicación y PostgreSQL). Las dependencias se instalarán durante la construcción de la imagen, a partir de `requirements.txt`:
+3. Construye y levanta los servicios definidos en `compose.yaml` (aplicación y PostgreSQL). Las dependencias se instalan durante la construcción de la imagen, a partir de `requirements.txt`:
 
    ```bash
    docker compose up -d --build
    ```
 
-4. Aplica las migraciones. Esto también cargará las salas iniciales mediante una migración de datos:
+4. Aplica las migraciones. Esto también carga las salas iniciales mediante una migración de datos:
 
    ```bash
    docker compose exec web python manage.py migrate
@@ -90,7 +88,7 @@ La actividad exige Python y Django; PostgreSQL y Docker son decisiones de arquit
 
 ### Credenciales de prueba
 
-Las creará el comando `crear_usuarios_prueba`. Habrá dos usuarios porque CA-08 necesita que una reservación pertenezca a otra persona.
+Las crea el comando `crear_usuarios_prueba` (reejecutarlo es seguro: restablece la contraseña). Hay dos usuarios porque CA-08 necesita que una reservación pertenezca a otra persona.
 
 | Usuario | Contraseña |
 | --- | --- |
@@ -99,7 +97,7 @@ Las creará el comando `crear_usuarios_prueba`. Habrá dos usuarios porque CA-08
 
 ## Ejecutar las pruebas
 
-Todos los comandos se ejecutarán dentro del contenedor `web`.
+Todos los comandos se ejecutan dentro del contenedor `web`.
 
 **Pruebas unitarias y de integración (UT-01 a UT-20, IT-01):**
 
@@ -113,9 +111,9 @@ docker compose exec web python manage.py test
 docker compose exec web python manage.py behave
 ```
 
-Los escenarios estarán en `features/`, organizados por historia de usuario: `reservaciones.feature` y `cancelaciones.feature`.
+Los escenarios están en `features/`, organizados por historia de usuario: `reservaciones.feature` (HU-01) y `cancelaciones.feature` (HU-02). Los steps están en `features/steps/` y los auxiliares de página en `features/paginas.py`; `features/environment.py` inicia un Chromium headless.
 
-**Cobertura (objetivo: 100% en archivos con lógica del equipo):**
+**Cobertura (100 % en archivos con lógica del equipo; `.coveragerc` exige `fail_under = 100`):**
 
 ```bash
 docker compose exec web coverage run manage.py test
@@ -137,11 +135,14 @@ Las exclusiones (migraciones, entornos virtuales, evidencias) están centralizad
 
 ```bash
 docker compose exec web radon cc . -s -a -e '*/migrations/*'
+docker compose exec web radon cc . -s -n C -e '*/migrations/*'
 ```
+
+La segunda orden muestra solo los bloques con complejidad ≥ 11; si no imprime nada, todos cumplen el límite.
 
 ### Exclusiones de cobertura
 
-Se definirán en `.coveragerc` y solo se excluirán archivos sin lógica funcional:
+Están definidas en `.coveragerc` (`omit`) y solo excluyen archivos sin lógica funcional:
 
 - **Migraciones de esquema:** las genera Django automáticamente.
 - **Migración de datos de las salas:** la escribe el equipo, pero solo inserta los registros iniciales y no contiene lógica de negocio.
@@ -206,20 +207,22 @@ WHERE a.estado = '\''VIGENTE'\'' AND b.estado = '\''VIGENTE'\''
 
 ## Evidencias entregables
 
-| Entregable | Ubicación prevista |
+| Entregable | Ubicación |
 | --- | --- |
-| E-03, E-04 Pruebas unitarias y BDD | `features/` y las pruebas de cada app; evidencia de ejecución en `evidencias/` |
-| E-05 Reporte de cobertura | `evidencias/cobertura/` |
-| E-06 Reporte PEP 8 | `evidencias/` |
-| E-07 Reporte de complejidad | `evidencias/` |
-| E-08 JMeter | `jmeter/` (`.jmx` y CSV) y `evidencias/jmeter/` (reporte HTML e interpretación) |
-| E-09 Bitácora TDD | `evidencias/` |
+| E-02 README | `README.md` |
+| E-03 Pruebas unitarias | Código en `reservaciones/tests/`; ejecución completa en `evidencias/pruebas_unitarias.txt` |
+| E-04 Pruebas BDD | `features/` (`.feature`, steps y `environment.py`); ejecución completa en `evidencias/bdd/behave_completo.txt` y rojo/verde de cada criterio en `evidencias/bdd/CA-XX_rojo.txt` / `CA-XX_verde.txt` |
+| E-05 Reporte de cobertura | HTML en `evidencias/cobertura/` (abrir `index.html`); resumen en `evidencias/cobertura_resumen.txt` |
+| E-06 Reporte PEP 8 | `evidencias/flake8.txt` |
+| E-07 Reporte de complejidad | `evidencias/radon.txt` |
+| E-08 JMeter | `jmeter/` (`.jmx` y CSV) y `evidencias/jmeter/` (reporte HTML, resumen e interpretación) |
+| E-09 Bitácora TDD | `evidencias/bitacora_tdd.md`, con la evidencia de cada ciclo en `evidencias/tdd/` |
 
-La carpeta `evidencias/` se versionará a propósito. La evidencia de ejecución puede guardarse como `.txt` o `.log`; ambos formatos se versionan dentro de `evidencias/`. Los reportes temporales (`htmlcov/`, `.coverage`, `*.jtl`) están en `.gitignore`.
+La carpeta `evidencias/` se versiona a propósito. La evidencia de ejecución se guarda como `.txt` o `.log`; ambos formatos se versionan dentro de `evidencias/`. Los reportes temporales (`htmlcov/`, `.coverage`, `*.jtl`) están en `.gitignore`.
 
 ## Metodología de desarrollo
 
-Cada incremento funcional seguirá el ciclo TDD:
+Cada incremento funcional siguió el ciclo TDD:
 
 1. Escribir una prueba para un comportamiento que aún no existe.
 2. Ejecutarla y conservar evidencia de que falla por la razón esperada.
@@ -227,8 +230,8 @@ Cada incremento funcional seguirá el ciclo TDD:
 4. Ejecutar la suite completa para detectar regresiones.
 5. Refactorizar código y pruebas.
 
-Los criterios de aceptación se traducirán a escenarios BDD con Behave y Selenium. Para que el historial sea verificable:
+Los criterios de aceptación CA-01 a CA-11 se tradujeron a escenarios BDD con Behave y Selenium. Para que el historial sea verificable:
 
-- Los commits serán pequeños y coherentes, y la prueba se commiteará antes que el código que la satisface.
-- La bitácora TDD (E-09) se irá llenando durante el desarrollo, no al final.
-- La evidencia de cada ejecución (pruebas fallidas y exitosas) se guardará en `evidencias/`.
+- Los commits son pequeños y coherentes, y la prueba se commiteó antes que el código que la satisface (`test:` → `feat:`), en ramas fusionadas a `main` mediante pull requests con *merge commit*.
+- La bitácora TDD (E-09) se llenó durante el desarrollo, con los hashes de los commits rojo y verde de cada ciclo.
+- La evidencia de cada ejecución (pruebas fallidas y exitosas) está en `evidencias/`.
