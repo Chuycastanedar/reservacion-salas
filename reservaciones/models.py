@@ -2,7 +2,8 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 
-from .validators import validar_capacidad, validar_fecha_no_pasada
+from .validators import (
+    validar_capacidad, validar_fecha_no_pasada, validar_orden_horas)
 
 
 class Sala(models.Model):
@@ -56,6 +57,11 @@ class Reservacion(models.Model):
                 validar_fecha_no_pasada(self.fecha)
             except ValidationError as error:
                 raise ValidationError({'fecha': error})
+        if self.hora_inicio is not None and self.hora_fin is not None:
+            try:
+                validar_orden_horas(self.hora_inicio, self.hora_fin)
+            except ValidationError as error:
+                raise ValidationError({'hora_fin': error})
         if self.sala_id is not None and self.asistentes is not None:
             try:
                 validar_capacidad(self.sala, self.asistentes)
