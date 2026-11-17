@@ -1,0 +1,22 @@
+Creating test database for alias 'default'...
+USING RUNNER: behave.runner:Runner
+Característica: Cancelación de reservaciones # features/cancelaciones.feature:2
+  Como usuario autenticado propietario de una reservación
+  Quiero cancelar una reservación que ya no utilizaré
+  Para liberar la sala y permitir que otro usuario pueda reservarla
+  Escenario: CA-07. Cancelar una reservación vigente con anticipación suficiente                  # features/cancelaciones.feature:7
+    Dado que existe una sala activa "Sala BDD" con capacidad para 4 personas                      # features/steps/reservacion_steps.py:25
+    Y el usuario "estudiante1" ha iniciado sesión                                                 # features/steps/autenticacion_steps.py:9
+    Y es propietario de una reservación vigente para "Sala BDD" dentro de 2 días de 10:00 a 11:00 # features/steps/cancelacion_steps.py:17
+    Cuando solicita cancelar esa reservación desde su lista                                       # features/steps/cancelacion_steps.py:32
+    Y confirma la cancelación                                                                     # features/steps/cancelacion_steps.py:42
+    Entonces ve el mensaje "La reservación se canceló correctamente."                             # features/steps/reservacion_steps.py:203
+    Y su lista muestra la reservación de "Sala BDD" con estado "CANCELADA"                        # features/steps/reservacion_steps.py:210
+    Y la reservación muestra su fecha y hora de cancelación                                       # features/steps/cancelacion_steps.py:52
+    Y puede registrar una nueva reservación para "Sala BDD" en ese mismo horario                  # features/steps/cancelacion_steps.py:62
+
+1 feature passed, 0 failed, 0 skipped
+1 scenario passed, 0 failed, 1 skipped
+9 steps passed, 0 failed, 6 skipped
+Took 0min 4.611s
+Destroying test database for alias 'default'...
