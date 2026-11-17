@@ -11,6 +11,7 @@ def existe_traslape(sala, fecha, hora_inicio, hora_fin):
     return Reservacion.objects.filter(
         sala=sala,
         fecha=fecha,
+        estado=Reservacion.Estado.VIGENTE,
         hora_inicio__lt=hora_fin,
         hora_fin__gt=hora_inicio,
     ).exists()
