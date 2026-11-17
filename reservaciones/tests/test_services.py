@@ -57,3 +57,14 @@ class TestCrearReservacion(RelojFijoMixin, TestCase):
         self.assertEqual(
             Reservacion.objects.first().proposito,
             'Estudio para el examen final')
+
+    def test_no_registra_duracion_menor_a_30_minutos(self):
+        self.datos['hora_fin'] = datetime.time(10, 29)
+        with self.assertRaises(ValidationError):
+            crear_reservacion(**self.datos)
+        self.assertEqual(Reservacion.objects.count(), 0)
+
+    def test_registra_duracion_de_30_minutos(self):
+        self.datos['hora_fin'] = datetime.time(10, 30)
+        crear_reservacion(**self.datos)
+        self.assertEqual(Reservacion.objects.count(), 1)

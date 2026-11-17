@@ -182,3 +182,9 @@ class TestFormReservacion(RelojFijoMixin, TestCase):
         self.assertEqual(form.errors['asistentes'], [
                          'El número de asistentes debe ser un número '
                          'entero.'])
+
+    def test_duracion_minima_mensaje(self):
+        self.data['hora_fin'] = '10:29'
+        form = ReservacionForm(self.data)
+        self.assertEqual(form.errors['hora_fin'], [
+                         'La reservación debe durar al menos 30 minutos.'])
