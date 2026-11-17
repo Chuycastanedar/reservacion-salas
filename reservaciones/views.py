@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
 from .forms import ReservacionForm
@@ -38,3 +39,7 @@ def nueva_reservacion(request):
         form = ReservacionForm()
     return render(
         request, 'reservaciones/reservacion_form.html', {'form': form})
+
+
+def cancelar_reservacion(request, pk):
+    return HttpResponse()
