@@ -86,3 +86,9 @@ class TestFormReservacion(RelojFijoMixin, TestCase):
         self.assertEqual(form.errors['hora_fin'], [
                          'La hora de fin debe ser posterior a la hora '
                          'de inicio.'])
+
+    def test_hora_fin_igual_a_inicio(self):
+        self.data['hora_inicio'] = '10:00'
+        self.data['hora_fin'] = '10:00'
+        form = ReservacionForm(self.data)
+        self.assertFalse(form.is_valid())
