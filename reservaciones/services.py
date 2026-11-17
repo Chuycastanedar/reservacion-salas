@@ -8,6 +8,7 @@ from .models import Reservacion, Sala
 
 MENSAJE_NO_DISPONIBLE = 'La sala no está disponible en el horario solicitado.'
 MENSAJE_PERIODO_CONCLUIDO = 'El periodo de cancelación ha concluido.'
+MENSAJE_YA_CANCELADA = 'La reservación ya fue cancelada.'
 MENSAJE_NO_PROPIETARIO = 'Solo el propietario puede cancelar la reservación.'
 
 ANTICIPACION_CANCELACION = datetime.timedelta(minutes=60)
@@ -49,6 +50,8 @@ def crear_reservacion(
 def cancelar_reservacion(reservacion, usuario, ahora=None):
     if reservacion.usuario_id != usuario.pk:
         raise PermissionDenied(MENSAJE_NO_PROPIETARIO)
+    if reservacion.estado != Reservacion.Estado.VIGENTE:
+        raise ValidationError(MENSAJE_YA_CANCELADA)
     ahora = ahora or timezone.now()
     if reservacion.inicio - ahora <= ANTICIPACION_CANCELACION:
         raise ValidationError(MENSAJE_PERIODO_CONCLUIDO)
