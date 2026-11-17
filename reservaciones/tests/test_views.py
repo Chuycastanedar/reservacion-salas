@@ -149,6 +149,15 @@ class TestViewsLista(RelojFijoMixin, TestCase):
         self.assertNotRegex(
             response.content.decode(), r'\d{2}/\d{2}/\d{4} \d{2}:\d{2}')
 
+    def test_boton_cancelar_reservacion_en_template(self):
+        usuario = self.inicia_sesion()
+        reservacion = self.crea_reservacion(usuario)
+        response = self.client.get('/reservaciones/')
+        self.assertInHTML(
+            f'<a href="/reservaciones/{reservacion.pk}/cancelar/" '
+            'class="enlace-cancelar">Cancelar</a>',
+            response.content.decode())
+
     def inicia_sesion(self):
         usuario = User.objects.create_user(
             username='estudiante1', password='Prueba12345!')
