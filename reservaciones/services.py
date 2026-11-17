@@ -3,7 +3,7 @@ from .models import Reservacion
 
 def crear_reservacion(
         usuario, sala, fecha, hora_inicio, hora_fin, asistentes, proposito):
-    return Reservacion.objects.create(
+    reservacion = Reservacion(
         usuario=usuario,
         sala=sala,
         fecha=fecha,
@@ -12,3 +12,6 @@ def crear_reservacion(
         asistentes=asistentes,
         proposito=proposito,
     )
+    reservacion.full_clean()
+    reservacion.save()
+    return reservacion
