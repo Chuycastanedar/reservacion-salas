@@ -352,5 +352,41 @@ class TestViewsCancelar(RelojFijoMixin, TestCase):
         self.assertContains(
             response, 'La reservación se canceló correctamente.')
 
+    def test_post_manipulado_no_cancela_reservacion_ajena(self):
+        ajena = self.crea_reservacion_ajena()
+        self.inicia_sesion()
+        response = self.client.post(
+            f'/reservaciones/{ajena.pk}/cancelar/')
+        self.assertEqual(response.status_code, 404)
+        ajena.refresh_from_db()
+        self.assertEqual(ajena.estado, Reservacion.Estado.VIGENTE)
+        self.assertIsNone(ajena.fecha_cancelacion)
+
+    def test_get_de_reservacion_ajena_responde_404(self):
+        ajena = self.crea_reservacion_ajena()
+        self.inicia_sesion()
+        response = self.client.get(f'/reservaciones/{ajena.pk}/cancelar/')
+        self.assertNotContains(
+            response, 'Asesoría confidencial de tesis', status_code=404)
+
+    def test_cancelar_reservacion_inexistente_responde_404(self):
+        self.inicia_sesion()
+        response = self.client.post('/reservaciones/9999/cancelar/')
+        self.assertEqual(response.status_code, 404)
+
     def inicia_sesion(self):
         self.client.force_login(self.usuario)
+
+    def crea_reservacion_ajena(self):
+        otro = User.objects.create_user(
+            username='estudiante2', password='Prueba12345!')
+        return Reservacion.objects.create(
+            usuario=otro,
+            sala=self.sala,
+            fecha=datetime.date(2030, 1, 17),
+            hora_inicio=datetime.time(12, 0),
+            hora_fin=datetime.time(13, 0),
+            asistentes=2,
+            proposito='Asesoría confidencial de tesis',
+        )
+
