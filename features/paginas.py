@@ -10,8 +10,8 @@ def esperar(browser, condicion):
     return WebDriverWait(browser, ESPERA).until(condicion)
 
 
-def iniciar_sesion(context, username, password):
-    browser = context.browser
+def iniciar_sesion(context, username, password, browser=None):
+    browser = browser or context.browser
     browser.get(context.get_url("/cuentas/login/"))
     browser.find_element(By.ID, "id_username").send_keys(username)
     browser.find_element(By.ID, "id_password").send_keys(password)
