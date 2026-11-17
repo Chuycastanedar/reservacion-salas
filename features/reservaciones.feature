@@ -22,3 +22,15 @@ Característica: Registro de reservaciones de salas
     Entonces ve el mensaje "El número de asistentes supera la capacidad de la sala."
     Y el formulario conserva los datos capturados
     Y su lista no muestra ninguna reservación
+
+  Esquema del escenario: CA-04. Rechazar una fecha u horario inválidos
+    Dado que existe una sala activa "Sala BDD" con capacidad para 4 personas
+    Y el usuario "estudiante1" ha iniciado sesión
+    Cuando intenta registrar una reservación para "Sala BDD" con fecha "<fecha>" de <inicio> a <fin>
+    Entonces ve el mensaje "<mensaje>"
+    Y su lista no muestra ninguna reservación
+
+    Ejemplos:
+      | fecha  | inicio | fin   | mensaje                                                |
+      | ayer   | 10:00  | 11:00 | La fecha no puede ser anterior al día actual.          |
+      | mañana | 11:00  | 10:00 | La hora de fin debe ser posterior a la hora de inicio. |

@@ -12,8 +12,15 @@ from reservaciones.models import Reservacion, Sala
 PROPOSITO_VALIDO = "Estudio para el examen final"
 
 
+DIAS_RELATIVOS = {"ayer": -1, "hoy": 0, "mañana": 1}
+
+
 def manana():
     return timezone.localdate() + timedelta(days=1)
+
+
+def fecha_relativa(nombre):
+    return timezone.localdate() + timedelta(days=DIAS_RELATIVOS[nombre])
 
 
 @given('que existe una sala activa "{nombre}" '
@@ -91,6 +98,13 @@ def registrar_reservacion(context, sala, fecha, inicio, fin, asistentes,
 def paso_intenta_registrar_con_asistentes(context, sala, asistentes):
     registrar_reservacion(
         context, sala, manana(), "10:00", "11:00", asistentes)
+
+
+@when('intenta registrar una reservación para "{sala}" '
+      'con fecha "{fecha}" de {inicio} a {fin}')
+def paso_intenta_registrar_con_horario(context, sala, fecha, inicio, fin):
+    registrar_reservacion(
+        context, sala, fecha_relativa(fecha), inicio, fin, 3)
 
 
 @then('ve el mensaje "{mensaje}"')
