@@ -22,6 +22,12 @@ def validar_fecha_no_pasada(fecha):
             'La fecha no puede ser anterior al día actual.')
 
 
+def validar_hora_inicio(hora_inicio):
+    if hora_inicio < HORA_APERTURA:
+        raise ValidationError(
+            'La hora de inicio debe estar entre las 08:00 y las 19:00.')
+
+
 def validar_orden_horas(hora_inicio, hora_fin):
     if hora_fin <= hora_inicio:
         raise ValidationError(
