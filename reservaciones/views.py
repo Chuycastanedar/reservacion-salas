@@ -47,6 +47,7 @@ def cancelar_reservacion(request, pk):
     reservacion = get_object_or_404(Reservacion, pk=pk)
     if request.method == 'POST':
         services.cancelar_reservacion(reservacion, request.user)
+        messages.success(request, 'La reservación se canceló correctamente.')
         return redirect('lista_reservaciones')
     return render(
         request,
