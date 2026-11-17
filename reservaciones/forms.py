@@ -27,6 +27,10 @@ class ReservacionForm(forms.ModelForm):
                 'invalid_choice':
                     'La sala no se encuentra disponible para reservación.',
             },
+            'asistentes': {
+                'invalid':
+                    'El número de asistentes debe ser un número entero.',
+            },
             'proposito': {
                 'max_length':
                     'El propósito no puede exceder los 200 caracteres.',
