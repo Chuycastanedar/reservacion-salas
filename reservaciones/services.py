@@ -37,3 +37,7 @@ def crear_reservacion(
             raise ValidationError(MENSAJE_NO_DISPONIBLE)
         reservacion.save()
     return reservacion
+
+
+def cancelar_reservacion(reservacion, usuario, ahora=None):
+    pass
