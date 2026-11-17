@@ -1,0 +1,20 @@
+Creating test database for alias 'default'...
+USING RUNNER: behave.runner:Runner
+Característica: Cancelación de reservaciones # features/cancelaciones.feature:2
+  Como usuario autenticado propietario de una reservación
+  Quiero cancelar una reservación que ya no utilizaré
+  Para liberar la sala y permitir que otro usuario pueda reservarla
+  Escenario: CA-08. Impedir que un usuario cancele una reservación ajena                                                                               # features/cancelaciones.feature:26
+    Dado que existe una sala activa "Sala BDD" con capacidad para 4 personas                                                                           # features/steps/reservacion_steps.py:25
+    Y existe una reservación vigente de "estudiante2" para "Sala BDD" dentro de 2 días de 10:00 a 11:00 con propósito "Asesoría confidencial de tesis" # features/steps/cancelacion_steps.py:132
+    Y el usuario "estudiante1" ha iniciado sesión                                                                                                      # features/steps/autenticacion_steps.py:9
+    Cuando intenta cancelarla abriendo la URL de cancelación de esa reservación                                                                        # features/steps/cancelacion_steps.py:151
+    Entonces ve una página de recurso no encontrado                                                                                                    # features/steps/cancelacion_steps.py:158
+    Y la página no muestra el propósito "Asesoría confidencial de tesis"                                                                               # features/steps/cancelacion_steps.py:165
+    Y al iniciar sesión "estudiante2" su lista muestra la reservación con estado "VIGENTE"                                                             # features/steps/cancelacion_steps.py:172
+
+1 feature passed, 0 failed, 0 skipped
+1 scenario passed, 0 failed, 2 skipped
+7 steps passed, 0 failed, 15 skipped
+Took 0min 6.192s
+Destroying test database for alias 'default'...

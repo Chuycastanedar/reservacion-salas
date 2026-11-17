@@ -9,7 +9,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
 
 from features.paginas import (
-    asignar_valor, esperar, llenar_texto, seleccionar_sala, texto_visible)
+    asignar_valor, capturar_formulario, esperar, fecha_relativa,
+    llenar_texto, seleccionar_sala, texto_visible)
 from reservaciones.models import Reservacion, Sala
 
 PASSWORD = "Prueba12345!"
@@ -17,15 +18,8 @@ PASSWORD = "Prueba12345!"
 PROPOSITO_VALIDO = "Estudio para el examen final"
 
 
-DIAS_RELATIVOS = {"ayer": -1, "hoy": 0, "mañana": 1}
-
-
 def manana():
     return timezone.localdate() + timedelta(days=1)
-
-
-def fecha_relativa(nombre):
-    return timezone.localdate() + timedelta(days=DIAS_RELATIVOS[nombre])
 
 
 @given('que existe una sala activa "{nombre}" '
@@ -114,14 +108,6 @@ def registrar_reservacion(context, sala, fecha, inicio, fin, asistentes,
     context.capturado["sala"] = sala
     capturar_formulario(context.browser, context.capturado)
     paso_envia_formulario(context)
-
-
-def capturar_formulario(browser, datos):
-    seleccionar_sala(browser, datos["sala"])
-    for campo in ("fecha", "hora_inicio", "hora_fin"):
-        asignar_valor(browser, f"id_{campo}", datos[campo])
-    for campo in ("asistentes", "proposito"):
-        llenar_texto(browser, f"id_{campo}", datos[campo])
 
 
 @when('intenta registrar una reservación válida para "{sala}" '

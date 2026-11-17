@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from reservaciones.models import Reservacion, Sala
-from reservaciones.tests.utilidades import RelojFijoMixin
+from reservaciones.tests.utilidades import ZONA, RelojFijoMixin
 
 
 class TestViewsAutenticacion(RelojFijoMixin, TestCase):
@@ -129,13 +129,71 @@ class TestViewsLista(RelojFijoMixin, TestCase):
         self.assertContains(
             response, 'No tienes reservaciones registradas.')
 
+    def test_cancelada_muestra_fecha_de_cancelacion(self):
+        usuario = self.inicia_sesion()
+        self.crea_reservacion(
+            usuario,
+            estado=Reservacion.Estado.CANCELADA,
+            fecha_cancelacion=datetime.datetime(
+                2030, 1, 14, 9, 15, tzinfo=ZONA),
+        )
+        response = self.client.get('/reservaciones/')
+        self.assertContains(response, 'CANCELADA')
+        self.assertContains(response, '14/01/2030 09:15')
+
+    def test_vigente_no_muestra_fecha_de_cancelacion(self):
+        usuario = self.inicia_sesion()
+        self.crea_reservacion(usuario)
+        response = self.client.get('/reservaciones/')
+        self.assertContains(response, 'VIGENTE')
+        self.assertNotRegex(
+            response.content.decode(), r'\d{2}/\d{2}/\d{4} \d{2}:\d{2}')
+
+    def test_boton_cancelar_reservacion_en_template(self):
+        usuario = self.inicia_sesion()
+        reservacion = self.crea_reservacion(usuario)
+        response = self.client.get('/reservaciones/')
+        self.assertInHTML(
+            f'<a href="/reservaciones/{reservacion.pk}/cancelar/" '
+            'class="enlace-cancelar">Cancelar</a>',
+            response.content.decode())
+
+    def test_no_muestra_boton_cancelar_en_cancelada(self):
+        usuario = self.inicia_sesion()
+        reservacion = self.crea_reservacion(
+            usuario,
+            estado=Reservacion.Estado.CANCELADA,
+            fecha_cancelacion=datetime.datetime(
+                2030, 1, 14, 9, 15, tzinfo=ZONA),
+        )
+        response = self.client.get('/reservaciones/')
+        self.assertNotContains(
+            response, f'/reservaciones/{reservacion.pk}/cancelar/')
+
+    def test_no_muestra_boton_cancelar_si_faltan_60_minutos(self):
+        usuario = self.inicia_sesion()
+        sala = Sala.objects.create(
+            nombre='Sala de prueba', ubicacion='Edificio A', capacidad=4)
+        reservacion = Reservacion.objects.create(
+            usuario=usuario,
+            sala=sala,
+            fecha=datetime.date(2030, 1, 15),
+            hora_inicio=datetime.time(10, 0),
+            hora_fin=datetime.time(11, 0),
+            asistentes=3,
+            proposito='Estudio para el examen final',
+        )
+        response = self.client.get('/reservaciones/')
+        self.assertNotContains(
+            response, f'/reservaciones/{reservacion.pk}/cancelar/')
+
     def inicia_sesion(self):
         usuario = User.objects.create_user(
             username='estudiante1', password='Prueba12345!')
         self.client.login(username='estudiante1', password='Prueba12345!')
         return usuario
 
-    def crea_reservacion(self, usuario):
+    def crea_reservacion(self, usuario, **campos):
         sala = Sala.objects.create(
             nombre='Sala de prueba', ubicacion='Edificio A', capacidad=4)
         return Reservacion.objects.create(
@@ -146,6 +204,7 @@ class TestViewsLista(RelojFijoMixin, TestCase):
             hora_fin=datetime.time(11, 0),
             asistentes=3,
             proposito='Estudio para el examen final',
+            **campos,
         )
 
 
@@ -261,4 +320,120 @@ class TestViewsNuevaReservacion(RelojFijoMixin, TestCase):
             hora_fin=datetime.time(11, 0),
             asistentes=2,
             proposito='Repaso de cálculo diferencial',
+        )
+
+
+class TestViewsCancelar(RelojFijoMixin, TestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.usuario = User.objects.create_user(
+            username='estudiante1', password='Prueba12345!')
+        self.sala = Sala.objects.create(
+            nombre='Sala de prueba', ubicacion='Edificio A', capacidad=4)
+        self.reservacion = Reservacion.objects.create(
+            usuario=self.usuario,
+            sala=self.sala,
+            fecha=datetime.date(2030, 1, 17),
+            hora_inicio=datetime.time(10, 0),
+            hora_fin=datetime.time(11, 0),
+            asistentes=3,
+            proposito='Estudio para el examen final',
+        )
+        self.url = f'/reservaciones/{self.reservacion.pk}/cancelar/'
+
+    def test_redirige_si_no_inicio_sesion_cancelar(self):
+        response = self.client.post(self.url)
+        self.assertRedirects(
+            response, f'/cuentas/login/?next={self.url}',
+            fetch_redirect_response=False)
+        self.assertEqual(
+            Reservacion.objects.first().estado, Reservacion.Estado.VIGENTE)
+
+    def test_confirmar_cancelacion_response(self):
+        self.inicia_sesion()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_template_correcto_confirmar_cancelacion(self):
+        self.inicia_sesion()
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(
+            response, 'reservaciones/confirmar_cancelacion.html')
+
+    def test_get_no_cancela_la_reservacion(self):
+        self.inicia_sesion()
+        self.client.get(self.url)
+        reservacion = Reservacion.objects.first()
+        self.assertEqual(reservacion.estado, Reservacion.Estado.VIGENTE)
+        self.assertIsNone(reservacion.fecha_cancelacion)
+
+    def test_formulario_de_confirmacion_en_el_template(self):
+        self.inicia_sesion()
+        response = self.client.get(self.url)
+        self.assertContains(response, 'method="post"')
+        self.assertContains(response, 'csrfmiddlewaretoken')
+        self.assertContains(response, 'id="btn-confirmar-cancelacion"')
+
+    def test_mensaje_de_exito_al_cancelar(self):
+        self.inicia_sesion()
+        response = self.client.post(self.url, follow=True)
+        self.assertContains(
+            response, 'La reservación se canceló correctamente.')
+
+    def test_post_manipulado_no_cancela_reservacion_ajena(self):
+        ajena = self.crea_reservacion_ajena()
+        self.inicia_sesion()
+        response = self.client.post(
+            f'/reservaciones/{ajena.pk}/cancelar/')
+        self.assertEqual(response.status_code, 404)
+        ajena.refresh_from_db()
+        self.assertEqual(ajena.estado, Reservacion.Estado.VIGENTE)
+        self.assertIsNone(ajena.fecha_cancelacion)
+
+    def test_get_de_reservacion_ajena_responde_404(self):
+        ajena = self.crea_reservacion_ajena()
+        self.inicia_sesion()
+        response = self.client.get(f'/reservaciones/{ajena.pk}/cancelar/')
+        self.assertNotContains(
+            response, 'Asesoría confidencial de tesis', status_code=404)
+
+    def test_cancelar_reservacion_inexistente_responde_404(self):
+        self.inicia_sesion()
+        response = self.client.post('/reservaciones/9999/cancelar/')
+        self.assertEqual(response.status_code, 404)
+
+    def test_cancelacion_tardia_muestra_mensaje(self):
+        tardia = Reservacion.objects.create(
+            usuario=self.usuario,
+            sala=self.sala,
+            fecha=datetime.date(2030, 1, 15),
+            hora_inicio=datetime.time(9, 30),
+            hora_fin=datetime.time(10, 30),
+            asistentes=3,
+            proposito='Estudio para el examen final',
+        )
+        self.inicia_sesion()
+        self.client.raise_request_exception = False
+        response = self.client.post(
+            f'/reservaciones/{tardia.pk}/cancelar/', follow=True)
+        self.assertContains(
+            response, 'El periodo de cancelación ha concluido.')
+        tardia.refresh_from_db()
+        self.assertEqual(tardia.estado, Reservacion.Estado.VIGENTE)
+
+    def inicia_sesion(self):
+        self.client.force_login(self.usuario)
+
+    def crea_reservacion_ajena(self):
+        otro = User.objects.create_user(
+            username='estudiante2', password='Prueba12345!')
+        return Reservacion.objects.create(
+            usuario=otro,
+            sala=self.sala,
+            fecha=datetime.date(2030, 1, 17),
+            hora_inicio=datetime.time(12, 0),
+            hora_fin=datetime.time(13, 0),
+            asistentes=2,
+            proposito='Asesoría confidencial de tesis',
         )

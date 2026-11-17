@@ -1,9 +1,14 @@
 """Auxiliares de página compartidos por los steps de Selenium."""
+from datetime import timedelta
+
+from django.utils import timezone
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select, WebDriverWait
 
 ESPERA = 10
+
+DIAS_RELATIVOS = {"ayer": -1, "hoy": 0, "mañana": 1}
 
 
 def esperar(browser, condicion):
@@ -40,3 +45,26 @@ def seleccionar_sala(browser, nombre):
 
 def texto_visible(browser):
     return browser.find_element(By.TAG_NAME, "body").text
+
+
+def capturar_formulario(browser, datos):
+    seleccionar_sala(browser, datos["sala"])
+    for campo in ("fecha", "hora_inicio", "hora_fin"):
+        asignar_valor(browser, f"id_{campo}", datos[campo])
+    for campo in ("asistentes", "proposito"):
+        llenar_texto(browser, f"id_{campo}", datos[campo])
+
+
+def fecha_relativa(nombre):
+    return timezone.localdate() + timedelta(days=DIAS_RELATIVOS[nombre])
+
+
+def fila_con_textos(browser, *textos):
+    """Primera fila de la tabla de reservaciones que contiene los textos."""
+    tablas = browser.find_elements(By.ID, "tabla-reservaciones")
+    assert tablas, "No se encontró la tabla 'tabla-reservaciones'"
+    for fila in tablas[0].find_elements(By.TAG_NAME, "tr"):
+        if all(texto in fila.text for texto in textos):
+            return fila
+    raise AssertionError(
+        f"Ninguna fila contiene {textos!r}:\n{tablas[0].text}")

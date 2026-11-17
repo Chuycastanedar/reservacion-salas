@@ -1,12 +1,12 @@
 import datetime
 
 from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.test import TestCase
 
 from reservaciones.models import Reservacion, Sala
-from reservaciones.services import crear_reservacion
-from reservaciones.tests.utilidades import RelojFijoMixin
+from reservaciones.services import cancelar_reservacion, crear_reservacion
+from reservaciones.tests.utilidades import AHORA, ZONA, RelojFijoMixin
 
 
 class TestCrearReservacion(RelojFijoMixin, TestCase):
@@ -181,3 +181,86 @@ class TestDisponibilidad(RelojFijoMixin, TestCase):
     def cuenta_vigentes(self):
         return Reservacion.objects.filter(
             estado=Reservacion.Estado.VIGENTE).count()
+
+
+class TestCancelarReservacion(RelojFijoMixin, TestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.usuario = User.objects.create_user(
+            username='estudiante1', password='Prueba12345!')
+        self.sala = Sala.objects.create(
+            nombre='Sala de prueba', ubicacion='Edificio A', capacidad=4)
+        self.reservacion = Reservacion.objects.create(
+            usuario=self.usuario,
+            sala=self.sala,
+            fecha=datetime.date(2030, 1, 17),
+            hora_inicio=datetime.time(10, 0),
+            hora_fin=datetime.time(11, 0),
+            asistentes=3,
+            proposito='Estudio para el examen final',
+        )
+
+    def test_cancela_reservacion_propia_vigente(self):
+        cancelar_reservacion(self.reservacion, self.usuario, ahora=AHORA)
+        self.assertEqual(Reservacion.objects.count(), 1)
+        self.assertEqual(
+            Reservacion.objects.first().estado,
+            Reservacion.Estado.CANCELADA)
+
+    def test_cancelacion_registra_fecha_y_hora(self):
+        cancelar_reservacion(self.reservacion, self.usuario, ahora=AHORA)
+        self.assertEqual(
+            Reservacion.objects.first().fecha_cancelacion, AHORA)
+
+    def test_rechaza_cancelacion_de_reservacion_ajena(self):
+        otro = User.objects.create_user(
+            username='estudiante2', password='Prueba12345!')
+        with self.assertRaises(PermissionDenied):
+            cancelar_reservacion(self.reservacion, otro, ahora=AHORA)
+        self.reservacion.refresh_from_db()
+        self.assertEqual(
+            self.reservacion.estado, Reservacion.Estado.VIGENTE)
+
+    def test_rechaza_cancelacion_con_menos_de_60_minutos(self):
+        ahora = self.inicio() - datetime.timedelta(minutes=59)
+        with self.assertRaises(ValidationError) as ctx:
+            cancelar_reservacion(self.reservacion, self.usuario, ahora=ahora)
+        self.assertEqual(
+            ctx.exception.messages,
+            ['El periodo de cancelación ha concluido.'])
+        self.reservacion.refresh_from_db()
+        self.assertEqual(
+            self.reservacion.estado, Reservacion.Estado.VIGENTE)
+
+    def test_rechaza_cancelacion_con_60_minutos_exactos(self):
+        ahora = self.inicio() - datetime.timedelta(minutes=60)
+        with self.assertRaises(ValidationError) as ctx:
+            cancelar_reservacion(self.reservacion, self.usuario, ahora=ahora)
+        self.assertEqual(
+            ctx.exception.messages,
+            ['El periodo de cancelación ha concluido.'])
+        self.reservacion.refresh_from_db()
+        self.assertEqual(
+            self.reservacion.estado, Reservacion.Estado.VIGENTE)
+
+    def test_cancela_con_61_minutos(self):
+        ahora = self.inicio() - datetime.timedelta(minutes=61)
+        cancelar_reservacion(self.reservacion, self.usuario, ahora=ahora)
+        self.reservacion.refresh_from_db()
+        self.assertEqual(
+            self.reservacion.estado, Reservacion.Estado.CANCELADA)
+
+    def test_rechaza_segunda_cancelacion(self):
+        cancelar_reservacion(self.reservacion, self.usuario, ahora=AHORA)
+        despues = AHORA + datetime.timedelta(hours=1)
+        with self.assertRaises(ValidationError) as ctx:
+            cancelar_reservacion(
+                self.reservacion, self.usuario, ahora=despues)
+        self.assertEqual(
+            ctx.exception.messages, ['La reservación ya fue cancelada.'])
+        self.reservacion.refresh_from_db()
+        self.assertEqual(self.reservacion.fecha_cancelacion, AHORA)
+
+    def inicio(self):
+        return datetime.datetime(2030, 1, 17, 10, 0, tzinfo=ZONA)

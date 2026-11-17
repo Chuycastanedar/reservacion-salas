@@ -1,9 +1,11 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import ReservacionForm
+from .models import Reservacion
+from . import services
 from .services import crear_reservacion
 
 
@@ -38,3 +40,24 @@ def nueva_reservacion(request):
         form = ReservacionForm()
     return render(
         request, 'reservaciones/reservacion_form.html', {'form': form})
+
+
+@login_required
+def cancelar_reservacion(request, pk):
+    reservacion = get_object_or_404(
+        Reservacion, pk=pk, usuario=request.user)
+    if request.method == 'POST':
+        try:
+            services.cancelar_reservacion(reservacion, request.user)
+        except ValidationError as error:
+            for mensaje in error.messages:
+                messages.error(request, mensaje)
+        else:
+            messages.success(
+                request, 'La reservación se canceló correctamente.')
+        return redirect('lista_reservaciones')
+    return render(
+        request,
+        'reservaciones/confirmar_cancelacion.html',
+        {'reservacion': reservacion},
+    )

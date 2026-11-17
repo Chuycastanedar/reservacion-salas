@@ -1,11 +1,16 @@
+import datetime
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils import timezone
 
 from .validators import (
     validar_asistentes, validar_capacidad, validar_duracion,
     validar_fecha_no_pasada, validar_hora_fin, validar_hora_inicio,
     validar_orden_horas, validar_proposito, validar_sala_activa)
+
+ANTICIPACION_CANCELACION = datetime.timedelta(minutes=60)
 
 
 class Sala(models.Model):
@@ -52,6 +57,24 @@ class Reservacion(models.Model):
             f'{self.hora_inicio:%H:%M}-{self.hora_fin:%H:%M} '
             f'({self.estado})'
         )
+
+    @property
+    def inicio(self):
+        """Fecha y hora de inicio como datetime en la zona activa."""
+        return timezone.make_aware(
+            datetime.datetime.combine(self.fecha, self.hora_inicio))
+
+    def esta_vigente(self):
+        """RN-10: solo una reservación VIGENTE puede cancelarse."""
+        return self.estado == self.Estado.VIGENTE
+
+    def en_periodo_de_cancelacion(self, ahora=None):
+        """RN-11: faltan más de 60 minutos para el inicio."""
+        ahora = ahora or timezone.now()
+        return self.inicio - ahora > ANTICIPACION_CANCELACION
+
+    def puede_cancelarse(self, ahora=None):
+        return self.esta_vigente() and self.en_periodo_de_cancelacion(ahora)
 
     # Reglas de dominio: (campo del error, validador, argumentos).
     REGLAS = (

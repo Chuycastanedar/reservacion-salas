@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block titulo %}Cancelar reservación{% endblock %}
+
+{% block contenido %}
+<h1>Cancelar reservación</h1>
+<p>¿Deseas cancelar la siguiente reservación?</p>
+<dl>
+  <dt>Sala</dt>
+  <dd>{{ reservacion.sala }}</dd>
+  <dt>Fecha</dt>
+  <dd>{{ reservacion.fecha|date:"Y-m-d" }}</dd>
+  <dt>Horario</dt>
+  <dd>{{ reservacion.hora_inicio|time:"H:i" }} - {{ reservacion.hora_fin|time:"H:i" }}</dd>
+</dl>
+<form method="post">
+  {% csrf_token %}
+  <button type="submit" id="btn-confirmar-cancelacion">Confirmar cancelación</button>
+</form>
+<a href="{% url 'lista_reservaciones' %}">Volver a mis reservaciones</a>
+{% endblock %}
