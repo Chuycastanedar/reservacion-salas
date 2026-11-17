@@ -22,6 +22,12 @@ class ReservacionForm(forms.ModelForm):
             'hora_fin': forms.TimeInput(
                 attrs={'type': 'time'}, format='%H:%M'),
         }
+        error_messages = {
+            'sala': {
+                'invalid_choice':
+                    'La sala no se encuentra disponible para reservación.',
+            },
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
