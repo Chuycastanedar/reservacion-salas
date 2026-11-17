@@ -40,4 +40,6 @@ def crear_reservacion(
 
 
 def cancelar_reservacion(reservacion, usuario, ahora=None):
-    pass
+    reservacion.estado = Reservacion.Estado.CANCELADA
+    reservacion.save()
+    return reservacion
