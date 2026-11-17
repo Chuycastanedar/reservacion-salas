@@ -2,12 +2,14 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from reservaciones.models import Reservacion, Sala
+from reservaciones.tests.utilidades import RelojFijoMixin
 import datetime
 
 
-class TestModels(TestCase):
+class TestModels(RelojFijoMixin, TestCase):
 
     def setUp(self):
+        super().setUp()
         self.usuario = User.objects.create_user(
             username='estudiante1', password='Prueba12345!')
         self.sala = Sala(

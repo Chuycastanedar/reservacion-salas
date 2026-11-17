@@ -5,9 +5,10 @@ from django.test import TestCase
 from django.urls import reverse
 
 from reservaciones.models import Reservacion, Sala
+from reservaciones.tests.utilidades import RelojFijoMixin
 
 
-class TestViewsAutenticacion(TestCase):
+class TestViewsAutenticacion(RelojFijoMixin, TestCase):
 
     def test_login_response(self):
         response = self.client.get('/cuentas/login/')
@@ -57,7 +58,7 @@ class TestViewsAutenticacion(TestCase):
             response, '/cuentas/login/', fetch_redirect_response=False)
 
 
-class TestViewsLista(TestCase):
+class TestViewsLista(RelojFijoMixin, TestCase):
 
     def test_redirige_si_no_inicio_sesion_lista(self):
         response = self.client.get('/reservaciones/')
@@ -148,9 +149,10 @@ class TestViewsLista(TestCase):
         )
 
 
-class TestViewsNuevaReservacion(TestCase):
+class TestViewsNuevaReservacion(RelojFijoMixin, TestCase):
 
     def setUp(self):
+        super().setUp()
         self.sala = Sala.objects.create(
             nombre='Sala de prueba', ubicacion='Edificio A', capacidad=4)
         self.data = {

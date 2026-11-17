@@ -2,11 +2,13 @@ from django.test import TestCase
 
 from reservaciones.forms import ReservacionForm
 from reservaciones.models import Sala
+from reservaciones.tests.utilidades import RelojFijoMixin
 
 
-class TestFormReservacion(TestCase):
+class TestFormReservacion(RelojFijoMixin, TestCase):
 
     def setUp(self):
+        super().setUp()
         self.sala = Sala.objects.create(
             nombre='Sala de prueba', ubicacion='Edificio A', capacidad=4)
         self.data = {
@@ -52,5 +54,21 @@ class TestFormReservacion(TestCase):
 
     def test_asistentes_igual_a_capacidad_valido(self):
         self.data['asistentes'] = 4
+        form = ReservacionForm(self.data)
+        self.assertTrue(form.is_valid())
+
+    def test_fecha_pasada(self):
+        self.data['fecha'] = '2030-01-14'
+        form = ReservacionForm(self.data)
+        self.assertFalse(form.is_valid())
+
+    def test_fecha_pasada_mensaje(self):
+        self.data['fecha'] = '2030-01-14'
+        form = ReservacionForm(self.data)
+        self.assertEqual(form.errors['fecha'], [
+                         'La fecha no puede ser anterior al día actual.'])
+
+    def test_fecha_de_hoy_valida(self):
+        self.data['fecha'] = '2030-01-15'
         form = ReservacionForm(self.data)
         self.assertTrue(form.is_valid())

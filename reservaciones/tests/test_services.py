@@ -6,11 +6,13 @@ from django.test import TestCase
 
 from reservaciones.models import Reservacion, Sala
 from reservaciones.services import crear_reservacion
+from reservaciones.tests.utilidades import RelojFijoMixin
 
 
-class TestCrearReservacion(TestCase):
+class TestCrearReservacion(RelojFijoMixin, TestCase):
 
     def setUp(self):
+        super().setUp()
         self.usuario = User.objects.create_user(
             username='estudiante1', password='Prueba12345!')
         self.sala = Sala.objects.create(
