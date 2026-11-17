@@ -5,8 +5,8 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from reservaciones.models import Reservacion, Sala
-from reservaciones.services import crear_reservacion
-from reservaciones.tests.utilidades import RelojFijoMixin
+from reservaciones.services import cancelar_reservacion, crear_reservacion
+from reservaciones.tests.utilidades import AHORA, RelojFijoMixin
 
 
 class TestCrearReservacion(RelojFijoMixin, TestCase):
@@ -181,3 +181,29 @@ class TestDisponibilidad(RelojFijoMixin, TestCase):
     def cuenta_vigentes(self):
         return Reservacion.objects.filter(
             estado=Reservacion.Estado.VIGENTE).count()
+
+
+class TestCancelarReservacion(RelojFijoMixin, TestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.usuario = User.objects.create_user(
+            username='estudiante1', password='Prueba12345!')
+        self.sala = Sala.objects.create(
+            nombre='Sala de prueba', ubicacion='Edificio A', capacidad=4)
+        self.reservacion = Reservacion.objects.create(
+            usuario=self.usuario,
+            sala=self.sala,
+            fecha=datetime.date(2030, 1, 17),
+            hora_inicio=datetime.time(10, 0),
+            hora_fin=datetime.time(11, 0),
+            asistentes=3,
+            proposito='Estudio para el examen final',
+        )
+
+    def test_cancela_reservacion_propia_vigente(self):
+        cancelar_reservacion(self.reservacion, self.usuario, ahora=AHORA)
+        self.assertEqual(Reservacion.objects.count(), 1)
+        self.assertEqual(
+            Reservacion.objects.first().estado,
+            Reservacion.Estado.CANCELADA)
