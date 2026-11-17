@@ -1,7 +1,7 @@
 import datetime
 
 from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.test import TestCase
 
 from reservaciones.models import Reservacion, Sala
@@ -212,3 +212,12 @@ class TestCancelarReservacion(RelojFijoMixin, TestCase):
         cancelar_reservacion(self.reservacion, self.usuario, ahora=AHORA)
         self.assertEqual(
             Reservacion.objects.first().fecha_cancelacion, AHORA)
+
+    def test_rechaza_cancelacion_de_reservacion_ajena(self):
+        otro = User.objects.create_user(
+            username='estudiante2', password='Prueba12345!')
+        with self.assertRaises(PermissionDenied):
+            cancelar_reservacion(self.reservacion, otro, ahora=AHORA)
+        self.reservacion.refresh_from_db()
+        self.assertEqual(
+            self.reservacion.estado, Reservacion.Estado.VIGENTE)
