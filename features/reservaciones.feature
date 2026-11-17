@@ -43,3 +43,11 @@ Característica: Registro de reservaciones de salas
     Cuando intenta registrar una reservación válida para "Sala en revisión"
     Entonces ve el mensaje "La sala no se encuentra disponible para reservación."
     Y su lista no muestra ninguna reservación
+
+  Escenario: CA-02. Rechazar una reservación con horario traslapado
+    Dado que existe una sala activa "Sala BDD" con capacidad para 4 personas
+    Y existe una reservación vigente de "estudiante2" para "Sala BDD" mañana de 10:00 a 11:00
+    Y el usuario "estudiante1" ha iniciado sesión
+    Cuando intenta registrar una reservación para "Sala BDD" con fecha "mañana" de 10:30 a 11:30
+    Entonces ve el mensaje "La sala no está disponible en el horario solicitado."
+    Y su lista no muestra ninguna reservación
