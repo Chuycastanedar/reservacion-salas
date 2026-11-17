@@ -24,3 +24,9 @@ def validar_sala_activa(sala):
     if not sala.activa:
         raise ValidationError(
             'La sala no se encuentra disponible para reservación.')
+
+
+def validar_proposito(proposito):
+    if len(proposito) < 10:
+        raise ValidationError(
+            'El propósito debe tener al menos 10 caracteres.')

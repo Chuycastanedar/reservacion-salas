@@ -4,7 +4,7 @@ from django.db import models
 
 from .validators import (
     validar_capacidad, validar_fecha_no_pasada, validar_orden_horas,
-    validar_sala_activa)
+    validar_proposito, validar_sala_activa)
 
 
 class Sala(models.Model):
@@ -58,6 +58,7 @@ class Reservacion(models.Model):
         ('fecha', validar_fecha_no_pasada, ('fecha',)),
         ('hora_fin', validar_orden_horas, ('hora_inicio', 'hora_fin')),
         ('asistentes', validar_capacidad, ('sala', 'asistentes')),
+        ('proposito', validar_proposito, ('proposito',)),
     )
 
     def clean(self):
