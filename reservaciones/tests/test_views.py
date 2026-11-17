@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from reservaciones.models import Reservacion, Sala
-from reservaciones.tests.utilidades import RelojFijoMixin
+from reservaciones.tests.utilidades import ZONA, RelojFijoMixin
 
 
 class TestViewsAutenticacion(RelojFijoMixin, TestCase):
@@ -129,13 +129,33 @@ class TestViewsLista(RelojFijoMixin, TestCase):
         self.assertContains(
             response, 'No tienes reservaciones registradas.')
 
+    def test_cancelada_muestra_fecha_de_cancelacion(self):
+        usuario = self.inicia_sesion()
+        self.crea_reservacion(
+            usuario,
+            estado=Reservacion.Estado.CANCELADA,
+            fecha_cancelacion=datetime.datetime(
+                2030, 1, 14, 9, 15, tzinfo=ZONA),
+        )
+        response = self.client.get('/reservaciones/')
+        self.assertContains(response, 'CANCELADA')
+        self.assertContains(response, '14/01/2030 09:15')
+
+    def test_vigente_no_muestra_fecha_de_cancelacion(self):
+        usuario = self.inicia_sesion()
+        self.crea_reservacion(usuario)
+        response = self.client.get('/reservaciones/')
+        self.assertContains(response, 'VIGENTE')
+        self.assertNotRegex(
+            response.content.decode(), r'\d{2}/\d{2}/\d{4} \d{2}:\d{2}')
+
     def inicia_sesion(self):
         usuario = User.objects.create_user(
             username='estudiante1', password='Prueba12345!')
         self.client.login(username='estudiante1', password='Prueba12345!')
         return usuario
 
-    def crea_reservacion(self, usuario):
+    def crea_reservacion(self, usuario, **campos):
         sala = Sala.objects.create(
             nombre='Sala de prueba', ubicacion='Edificio A', capacidad=4)
         return Reservacion.objects.create(
@@ -146,6 +166,7 @@ class TestViewsLista(RelojFijoMixin, TestCase):
             hora_fin=datetime.time(11, 0),
             asistentes=3,
             proposito='Estudio para el examen final',
+            **campos,
         )
 
 
