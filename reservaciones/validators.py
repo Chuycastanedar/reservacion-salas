@@ -36,3 +36,14 @@ def validar_asistentes(asistentes):
     if asistentes < 1:
         raise ValidationError(
             'El número de asistentes debe ser mayor o igual a 1.')
+
+
+def _minutos(hora):
+    return hora.hour * 60 + hora.minute
+
+
+def validar_duracion(hora_inicio, hora_fin):
+    duracion = _minutos(hora_fin) - _minutos(hora_inicio)
+    if 0 < duracion < 30:
+        raise ValidationError(
+            'La reservación debe durar al menos 30 minutos.')
