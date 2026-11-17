@@ -1,0 +1,20 @@
+Creating test database for alias 'default'...
+USING RUNNER: behave.runner:Runner
+Característica: Registro de reservaciones de salas # features/reservaciones.feature:2
+  Como estudiante
+  Quiero reservar una sala de estudio
+  Para contar con un espacio en el horario que necesito
+  Escenario: CA-05. Rechazar una sala inactiva                                       # features/reservaciones.feature:38
+    Dado que existe una sala activa "Sala en revisión" con capacidad para 6 personas # features/steps/reservacion_steps.py:26
+    Y el usuario "estudiante1" ha iniciado sesión                                    # features/steps/autenticacion_steps.py:9
+    Y tiene abierto el formulario de nueva reservación                               # features/steps/reservacion_steps.py:53
+    Y la sala "Sala en revisión" fue marcada como inactiva                           # features/steps/reservacion_steps.py:39
+    Cuando intenta registrar una reservación válida para "Sala en revisión"          # features/steps/reservacion_steps.py:110
+    Entonces ve el mensaje "La sala no se encuentra disponible para reservación."    # features/steps/reservacion_steps.py:123
+    Y su lista no muestra ninguna reservación                                        # features/steps/reservacion_steps.py:157
+
+1 feature passed, 0 failed, 0 skipped
+1 scenario passed, 0 failed, 4 skipped
+7 steps passed, 0 failed, 25 skipped
+Took 0min 3.922s
+Destroying test database for alias 'default'...
