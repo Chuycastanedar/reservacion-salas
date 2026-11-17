@@ -1,5 +1,11 @@
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
+
+from .validators import (
+    validar_asistentes, validar_capacidad, validar_duracion,
+    validar_fecha_no_pasada, validar_hora_fin, validar_hora_inicio,
+    validar_orden_horas, validar_proposito, validar_sala_activa)
 
 
 class Sala(models.Model):
@@ -46,3 +52,36 @@ class Reservacion(models.Model):
             f'{self.hora_inicio:%H:%M}-{self.hora_fin:%H:%M} '
             f'({self.estado})'
         )
+
+    # Reglas de dominio: (campo del error, validador, argumentos).
+    REGLAS = (
+        ('sala', validar_sala_activa, ('sala',)),
+        ('fecha', validar_fecha_no_pasada, ('fecha',)),
+        ('hora_inicio', validar_hora_inicio, ('hora_inicio',)),
+        ('hora_fin', validar_hora_fin, ('hora_fin',)),
+        ('hora_fin', validar_orden_horas, ('hora_inicio', 'hora_fin')),
+        ('hora_fin', validar_duracion, ('hora_inicio', 'hora_fin')),
+        ('asistentes', validar_asistentes, ('asistentes',)),
+        ('asistentes', validar_capacidad, ('sala', 'asistentes')),
+        ('proposito', validar_proposito, ('proposito',)),
+    )
+
+    def clean(self):
+        errores = {}
+        for campo, validador, nombres in self.REGLAS:
+            argumentos = [self._valor_de(nombre) for nombre in nombres]
+            if None in argumentos:
+                continue
+            try:
+                validador(*argumentos)
+            except ValidationError as error:
+                errores.setdefault(campo, []).append(error)
+        if errores:
+            raise ValidationError(errores)
+
+    def _valor_de(self, nombre):
+        campo = self._meta.get_field(nombre)
+        # Ausente: None o cadena vacía (0 sí es un valor que se valida).
+        if getattr(self, campo.attname) in (None, ''):
+            return None
+        return getattr(self, nombre)

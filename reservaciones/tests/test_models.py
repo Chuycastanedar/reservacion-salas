@@ -2,12 +2,14 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from reservaciones.models import Reservacion, Sala
+from reservaciones.tests.utilidades import RelojFijoMixin
 import datetime
 
 
-class TestModels(TestCase):
+class TestModels(RelojFijoMixin, TestCase):
 
     def setUp(self):
+        super().setUp()
         self.usuario = User.objects.create_user(
             username='estudiante1', password='Prueba12345!')
         self.sala = Sala(
@@ -52,3 +54,8 @@ class TestModels(TestCase):
         self.assertEqual(
             str(Reservacion.objects.first()),
             'Sala de prueba · 2030-01-16 10:00-11:00 (VIGENTE)')
+
+    def test_proposito_solo_cuenta_texto_sin_espacios(self):
+        self.reservacion.proposito = '   corto    '
+        with self.assertRaises(ValidationError):
+            self.reservacion.full_clean()

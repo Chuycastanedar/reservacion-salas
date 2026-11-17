@@ -1,11 +1,13 @@
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.test import TestCase
+from reservaciones.tests.utilidades import RelojFijoMixin
 
 
-class TestCrearUsuariosPrueba(TestCase):
+class TestCrearUsuariosPrueba(RelojFijoMixin, TestCase):
 
     def setUp(self):
+        super().setUp()
         self.password = 'Prueba12345!'
 
     def test_crea_los_dos_usuarios(self):

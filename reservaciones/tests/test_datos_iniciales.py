@@ -1,8 +1,9 @@
 from django.test import TestCase
 from reservaciones.models import Sala
+from reservaciones.tests.utilidades import RelojFijoMixin
 
 
-class TestSalasIniciales(TestCase):
+class TestSalasIniciales(RelojFijoMixin, TestCase):
 
     def test_salas_iniciales_cargadas(self):
         salas = Sala.objects.order_by('id').values_list(
