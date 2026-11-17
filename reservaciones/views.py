@@ -1,10 +1,10 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
-from django.http import HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import ReservacionForm
+from .models import Reservacion
 from .services import crear_reservacion
 
 
@@ -43,4 +43,9 @@ def nueva_reservacion(request):
 
 @login_required
 def cancelar_reservacion(request, pk):
-    return HttpResponse()
+    reservacion = get_object_or_404(Reservacion, pk=pk)
+    return render(
+        request,
+        'reservaciones/confirmar_cancelacion.html',
+        {'reservacion': reservacion},
+    )
