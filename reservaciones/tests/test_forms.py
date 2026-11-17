@@ -115,3 +115,19 @@ class TestFormReservacion(RelojFijoMixin, TestCase):
         self.assertEqual(form.errors['sala'], [
                          'La sala no se encuentra disponible para '
                          'reservación.'])
+
+    def test_proposito_min_caracteres(self):
+        self.data['proposito'] = 'a' * 9
+        form = ReservacionForm(self.data)
+        self.assertFalse(form.is_valid())
+
+    def test_proposito_min_caracteres_mensaje(self):
+        self.data['proposito'] = 'a' * 9
+        form = ReservacionForm(self.data)
+        self.assertEqual(form.errors['proposito'], [
+                         'El propósito debe tener al menos 10 caracteres.'])
+
+    def test_proposito_con_10_caracteres_valido(self):
+        self.data['proposito'] = 'a' * 10
+        form = ReservacionForm(self.data)
+        self.assertTrue(form.is_valid())
