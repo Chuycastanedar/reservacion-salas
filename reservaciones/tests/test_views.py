@@ -1,7 +1,7 @@
 import datetime
 
 from django.contrib.auth.models import User
-from django.test import TestCase
+from django.test import Client, TestCase
 from django.urls import reverse
 
 from reservaciones.models import Reservacion, Sala
@@ -436,4 +436,53 @@ class TestViewsCancelar(RelojFijoMixin, TestCase):
             hora_fin=datetime.time(13, 0),
             asistentes=2,
             proposito='Asesoría confidencial de tesis',
+        )
+
+
+class TestViewsSeguridad(RelojFijoMixin, TestCase):
+
+    def setUp(self):
+        super().setUp()
+        self.client = Client(enforce_csrf_checks=True)
+        self.usuario = User.objects.create_user(
+            username='estudiante1', password='Prueba12345!')
+        self.sala = Sala.objects.create(
+            nombre='Sala de prueba', ubicacion='Edificio A', capacidad=4)
+        self.data = {
+            'sala': self.sala.pk,
+            'fecha': '2030-01-16',
+            'hora_inicio': '10:00',
+            'hora_fin': '11:00',
+            'asistentes': 3,
+            'proposito': 'Estudio para el examen final',
+        }
+
+    def test_no_agrega_reservacion_sin_token_csrf(self):
+        self.inicia_sesion()
+        response = self.client.post('/reservaciones/nueva/', data=self.data)
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Reservacion.objects.all().count(), 0)
+
+    def test_no_cancela_reservacion_sin_token_csrf(self):
+        reservacion = self.crea_reservacion()
+        self.inicia_sesion()
+        response = self.client.post(
+            f'/reservaciones/{reservacion.pk}/cancelar/')
+        self.assertEqual(response.status_code, 403)
+        reservacion.refresh_from_db()
+        self.assertEqual(reservacion.estado, Reservacion.Estado.VIGENTE)
+        self.assertIsNone(reservacion.fecha_cancelacion)
+
+    def inicia_sesion(self):
+        self.client.force_login(self.usuario)
+
+    def crea_reservacion(self):
+        return Reservacion.objects.create(
+            usuario=self.usuario,
+            sala=self.sala,
+            fecha=datetime.date(2030, 1, 17),
+            hora_inicio=datetime.time(10, 0),
+            hora_fin=datetime.time(11, 0),
+            asistentes=3,
+            proposito='Estudio para el examen final',
         )
