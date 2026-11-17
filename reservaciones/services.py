@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.utils import timezone
 
 from .models import Reservacion, Sala
 
@@ -41,5 +42,6 @@ def crear_reservacion(
 
 def cancelar_reservacion(reservacion, usuario, ahora=None):
     reservacion.estado = Reservacion.Estado.CANCELADA
+    reservacion.fecha_cancelacion = ahora or timezone.now()
     reservacion.save()
     return reservacion
