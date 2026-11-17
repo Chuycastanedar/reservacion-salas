@@ -155,6 +155,20 @@ class TestDisponibilidad(RelojFijoMixin, TestCase):
         self.registra_ignorando_rechazo()
         self.assertEqual(self.cuenta_vigentes(), 2)
 
+    def test_rechaza_traslape_que_contiene_a_la_existente(self):
+        self.datos['hora_inicio'] = datetime.time(9, 30)
+        self.datos['hora_fin'] = datetime.time(11, 30)
+        with self.assertRaises(ValidationError):
+            crear_reservacion(**self.datos)
+        self.assertEqual(Reservacion.objects.count(), 1)
+
+    def test_rechaza_traslape_contenido_en_la_existente(self):
+        self.datos['hora_inicio'] = datetime.time(10, 15)
+        self.datos['hora_fin'] = datetime.time(10, 45)
+        with self.assertRaises(ValidationError):
+            crear_reservacion(**self.datos)
+        self.assertEqual(Reservacion.objects.count(), 1)
+
     def registra_ignorando_rechazo(self):
         try:
             crear_reservacion(**self.datos)
