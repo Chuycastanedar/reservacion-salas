@@ -169,6 +169,15 @@ class TestDisponibilidad(RelojFijoMixin, TestCase):
             crear_reservacion(**self.datos)
         self.assertEqual(Reservacion.objects.count(), 1)
 
+    def test_ignora_reservaciones_canceladas(self):
+        self.existente.estado = Reservacion.Estado.CANCELADA
+        self.existente.save()
+        self.registra_ignorando_rechazo()
+        self.assertEqual(self.cuenta_vigentes(), 1)
+        self.assertEqual(
+            Reservacion.objects.get(usuario=self.usuario).estado,
+            Reservacion.Estado.VIGENTE)
+
     def registra_ignorando_rechazo(self):
         try:
             crear_reservacion(**self.datos)
