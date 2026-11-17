@@ -40,3 +40,13 @@ class TestCrearReservacion(RelojFijoMixin, TestCase):
         with self.assertRaises(ValidationError):
             crear_reservacion(**self.datos)
         self.assertEqual(Reservacion.objects.count(), 0)
+
+    def test_no_registra_en_sala_inactiva(self):
+        self.sala.activa = False
+        self.sala.save()
+        with self.assertRaises(ValidationError) as ctx:
+            crear_reservacion(**self.datos)
+        self.assertEqual(ctx.exception.message_dict['sala'], [
+                         'La sala no se encuentra disponible para '
+                         'reservación.'])
+        self.assertEqual(Reservacion.objects.count(), 0)
