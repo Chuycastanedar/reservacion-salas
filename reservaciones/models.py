@@ -10,6 +10,8 @@ from .validators import (
     validar_fecha_no_pasada, validar_hora_fin, validar_hora_inicio,
     validar_orden_horas, validar_proposito, validar_sala_activa)
 
+ANTICIPACION_CANCELACION = datetime.timedelta(minutes=60)
+
 
 class Sala(models.Model):
     nombre = models.CharField(max_length=100)
@@ -63,7 +65,11 @@ class Reservacion(models.Model):
             datetime.datetime.combine(self.fecha, self.hora_inicio))
 
     def puede_cancelarse(self, ahora=None):
-        return self.estado == self.Estado.VIGENTE
+        ahora = ahora or timezone.now()
+        return (
+            self.estado == self.Estado.VIGENTE
+            and self.inicio - ahora > ANTICIPACION_CANCELACION
+        )
 
     # Reglas de dominio: (campo del error, validador, argumentos).
     REGLAS = (
