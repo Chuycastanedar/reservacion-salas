@@ -1,5 +1,13 @@
+import datetime
+
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+
+# Límites de horario (RN-04) y de duración (RN-05).
+HORA_APERTURA = datetime.time(8, 0)
+HORA_CIERRE = datetime.time(20, 0)
+DURACION_MINIMA = datetime.timedelta(minutes=30)
+DURACION_MAXIMA = datetime.timedelta(hours=2)
 
 
 def validar_capacidad(sala, asistentes):
@@ -38,15 +46,17 @@ def validar_asistentes(asistentes):
             'El número de asistentes debe ser mayor o igual a 1.')
 
 
-def _minutos(hora):
-    return hora.hour * 60 + hora.minute
+def _duracion(hora_inicio, hora_fin):
+    dia = datetime.date.min
+    return (datetime.datetime.combine(dia, hora_fin)
+            - datetime.datetime.combine(dia, hora_inicio))
 
 
 def validar_duracion(hora_inicio, hora_fin):
-    duracion = _minutos(hora_fin) - _minutos(hora_inicio)
-    if 0 < duracion < 30:
+    duracion = _duracion(hora_inicio, hora_fin)
+    if datetime.timedelta(0) < duracion < DURACION_MINIMA:
         raise ValidationError(
             'La reservación debe durar al menos 30 minutos.')
-    if duracion > 120:
+    if duracion > DURACION_MAXIMA:
         raise ValidationError(
             'La reservación no puede durar más de 2 horas.')
