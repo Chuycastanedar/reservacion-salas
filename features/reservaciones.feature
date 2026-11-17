@@ -14,3 +14,11 @@ Característica: Registro de reservaciones de salas
     Y envía el formulario
     Entonces ve el mensaje "La reservación se registró correctamente."
     Y su lista muestra la reservación de "Sala BDD" con estado "VIGENTE"
+
+  Escenario: CA-03. Rechazar una reservación que exceda la capacidad
+    Dado que existe una sala activa "Sala BDD" con capacidad para 4 personas
+    Y el usuario "estudiante1" ha iniciado sesión
+    Cuando intenta registrar una reservación válida para "Sala BDD" con 5 asistentes
+    Entonces ve el mensaje "El número de asistentes supera la capacidad de la sala."
+    Y el formulario conserva los datos capturados
+    Y su lista no muestra ninguna reservación
