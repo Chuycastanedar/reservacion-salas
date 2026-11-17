@@ -5,6 +5,7 @@ from django.utils import timezone
 
 # Límites de horario (RN-04) y de duración (RN-05).
 HORA_APERTURA = datetime.time(8, 0)
+HORA_INICIO_MAXIMA = datetime.time(19, 0)
 HORA_CIERRE = datetime.time(20, 0)
 DURACION_MINIMA = datetime.timedelta(minutes=30)
 DURACION_MAXIMA = datetime.timedelta(hours=2)
@@ -23,7 +24,7 @@ def validar_fecha_no_pasada(fecha):
 
 
 def validar_hora_inicio(hora_inicio):
-    if hora_inicio < HORA_APERTURA:
+    if not HORA_APERTURA <= hora_inicio <= HORA_INICIO_MAXIMA:
         raise ValidationError(
             'La hora de inicio debe estar entre las 08:00 y las 19:00.')
 
