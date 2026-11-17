@@ -251,5 +251,16 @@ class TestCancelarReservacion(RelojFijoMixin, TestCase):
         self.assertEqual(
             self.reservacion.estado, Reservacion.Estado.CANCELADA)
 
+    def test_rechaza_segunda_cancelacion(self):
+        cancelar_reservacion(self.reservacion, self.usuario, ahora=AHORA)
+        despues = AHORA + datetime.timedelta(hours=1)
+        with self.assertRaises(ValidationError) as ctx:
+            cancelar_reservacion(
+                self.reservacion, self.usuario, ahora=despues)
+        self.assertEqual(
+            ctx.exception.messages, ['La reservación ya fue cancelada.'])
+        self.reservacion.refresh_from_db()
+        self.assertEqual(self.reservacion.fecha_cancelacion, AHORA)
+
     def inicio(self):
         return datetime.datetime(2030, 1, 17, 10, 0, tzinfo=ZONA)
