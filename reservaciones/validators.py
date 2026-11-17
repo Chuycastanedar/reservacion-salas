@@ -15,6 +15,6 @@ def validar_fecha_no_pasada(fecha):
 
 
 def validar_orden_horas(hora_inicio, hora_fin):
-    if hora_fin < hora_inicio:
+    if hora_fin <= hora_inicio:
         raise ValidationError(
             'La hora de fin debe ser posterior a la hora de inicio.')
