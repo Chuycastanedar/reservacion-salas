@@ -1,5 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.db.models import Q
 
 from .models import Reservacion
 
@@ -7,11 +8,12 @@ MENSAJE_NO_DISPONIBLE = 'La sala no está disponible en el horario solicitado.'
 
 
 def existe_traslape(sala, fecha, hora_inicio, hora_fin):
+    inicio_dentro = Q(hora_inicio__lte=hora_inicio, hora_fin__gte=hora_inicio)
+    fin_dentro = Q(hora_inicio__lte=hora_fin, hora_fin__gte=hora_fin)
     return Reservacion.objects.filter(
+        inicio_dentro | fin_dentro,
         sala=sala,
         fecha=fecha,
-        hora_inicio=hora_inicio,
-        hora_fin=hora_fin,
     ).exists()
 
 
