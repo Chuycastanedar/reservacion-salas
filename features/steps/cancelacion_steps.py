@@ -98,10 +98,11 @@ def instante_relativo(texto):
 @given('canceló {instante} una reservación suya para "{sala}"')
 def paso_reservacion_cancelada(context, instante, sala):
     dia, _, hora = instante.partition(" a las ")
-    Reservacion.objects.create(
+    # Inicio dentro de 2 días: el estado es la única regla incumplida.
+    context.reservacion = Reservacion.objects.create(
         usuario=context.usuario,
         sala=context.sala,
-        fecha=fecha_relativa(dia),
+        fecha=timezone.localdate() + timedelta(days=2),
         hora_inicio="10:00",
         hora_fin="11:00",
         asistentes=2,

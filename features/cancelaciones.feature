@@ -39,3 +39,12 @@ Característica: Cancelación de reservaciones
     Cuando abre la cancelación de esa reservación y la confirma
     Entonces ve el mensaje "El periodo de cancelación ha concluido."
     Y su lista muestra la reservación de "Sala BDD" con estado "VIGENTE"
+
+  Escenario: CA-10. Impedir cancelar nuevamente una reservación cancelada
+    Dado que existe una sala activa "Sala BDD" con capacidad para 4 personas
+    Y el usuario "estudiante1" ha iniciado sesión
+    Y canceló ayer a las 09:15 una reservación suya para "Sala BDD"
+    Cuando abre la cancelación de esa reservación y la confirma
+    Entonces ve el mensaje "La reservación ya fue cancelada."
+    Y su lista muestra la reservación de "Sala BDD" con estado "CANCELADA"
+    Y puede identificar la fecha y hora de cancelación "ayer 09:15"
