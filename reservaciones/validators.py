@@ -30,3 +30,9 @@ def validar_proposito(proposito):
     if len(proposito.strip()) < 10:
         raise ValidationError(
             'El propósito debe tener al menos 10 caracteres.')
+
+
+def validar_asistentes(asistentes):
+    if asistentes == 0:
+        raise ValidationError(
+            'El número de asistentes debe ser mayor o igual a 1.')
