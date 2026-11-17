@@ -311,3 +311,31 @@ class TestViewsCancelar(RelojFijoMixin, TestCase):
             fetch_redirect_response=False)
         self.assertEqual(
             Reservacion.objects.first().estado, Reservacion.Estado.VIGENTE)
+
+    def test_confirmar_cancelacion_response(self):
+        self.inicia_sesion()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_template_correcto_confirmar_cancelacion(self):
+        self.inicia_sesion()
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(
+            response, 'reservaciones/confirmar_cancelacion.html')
+
+    def test_get_no_cancela_la_reservacion(self):
+        self.inicia_sesion()
+        self.client.get(self.url)
+        reservacion = Reservacion.objects.first()
+        self.assertEqual(reservacion.estado, Reservacion.Estado.VIGENTE)
+        self.assertIsNone(reservacion.fecha_cancelacion)
+
+    def test_formulario_de_confirmacion_en_el_template(self):
+        self.inicia_sesion()
+        response = self.client.get(self.url)
+        self.assertContains(response, 'method="post"')
+        self.assertContains(response, 'csrfmiddlewaretoken')
+        self.assertContains(response, 'id="btn-confirmar-cancelacion"')
+
+    def inicia_sesion(self):
+        self.client.force_login(self.usuario)
