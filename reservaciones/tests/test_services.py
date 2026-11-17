@@ -142,3 +142,25 @@ class TestDisponibilidad(RelojFijoMixin, TestCase):
         with self.assertRaises(ValidationError):
             crear_reservacion(**self.datos)
         self.assertEqual(Reservacion.objects.count(), 1)
+
+    def test_permite_horario_adyacente_posterior(self):
+        self.datos['hora_inicio'] = datetime.time(11, 0)
+        self.datos['hora_fin'] = datetime.time(12, 0)
+        self.registra_ignorando_rechazo()
+        self.assertEqual(self.cuenta_vigentes(), 2)
+
+    def test_permite_horario_adyacente_anterior(self):
+        self.datos['hora_inicio'] = datetime.time(9, 0)
+        self.datos['hora_fin'] = datetime.time(10, 0)
+        self.registra_ignorando_rechazo()
+        self.assertEqual(self.cuenta_vigentes(), 2)
+
+    def registra_ignorando_rechazo(self):
+        try:
+            crear_reservacion(**self.datos)
+        except ValidationError:
+            pass
+
+    def cuenta_vigentes(self):
+        return Reservacion.objects.filter(
+            estado=Reservacion.Estado.VIGENTE).count()
