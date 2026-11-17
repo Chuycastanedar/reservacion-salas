@@ -337,5 +337,11 @@ class TestViewsCancelar(RelojFijoMixin, TestCase):
         self.assertContains(response, 'csrfmiddlewaretoken')
         self.assertContains(response, 'id="btn-confirmar-cancelacion"')
 
+    def test_mensaje_de_exito_al_cancelar(self):
+        self.inicia_sesion()
+        response = self.client.post(self.url, follow=True)
+        self.assertContains(
+            response, 'La reservación se canceló correctamente.')
+
     def inicia_sesion(self):
         self.client.force_login(self.usuario)
