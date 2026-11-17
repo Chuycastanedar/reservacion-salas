@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import ReservacionForm
 from .models import Reservacion
+from . import services
 from .services import crear_reservacion
 
 
@@ -44,6 +45,9 @@ def nueva_reservacion(request):
 @login_required
 def cancelar_reservacion(request, pk):
     reservacion = get_object_or_404(Reservacion, pk=pk)
+    if request.method == 'POST':
+        services.cancelar_reservacion(reservacion, request.user)
+        return redirect('lista_reservaciones')
     return render(
         request,
         'reservaciones/confirmar_cancelacion.html',
