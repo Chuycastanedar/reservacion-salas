@@ -98,3 +98,20 @@ class TestFormReservacion(RelojFijoMixin, TestCase):
         form = ReservacionForm(self.data)
         self.assertEqual(form.errors['hora_fin'], [
                          'Este campo es obligatorio.'])
+
+    def test_sala_inactiva_mensaje(self):
+        inactiva = Sala.objects.create(
+            nombre='Sala inactiva', ubicacion='Edificio B', capacidad=4,
+            activa=False)
+        self.data['sala'] = inactiva.pk
+        form = ReservacionForm(self.data)
+        self.assertEqual(form.errors['sala'], [
+                         'La sala no se encuentra disponible para '
+                         'reservación.'])
+
+    def test_sala_inexistente_mensaje(self):
+        self.data['sala'] = 9999
+        form = ReservacionForm(self.data)
+        self.assertEqual(form.errors['sala'], [
+                         'La sala no se encuentra disponible para '
+                         'reservación.'])
