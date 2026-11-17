@@ -170,6 +170,23 @@ class TestViewsLista(RelojFijoMixin, TestCase):
         self.assertNotContains(
             response, f'/reservaciones/{reservacion.pk}/cancelar/')
 
+    def test_no_muestra_boton_cancelar_si_faltan_60_minutos(self):
+        usuario = self.inicia_sesion()
+        sala = Sala.objects.create(
+            nombre='Sala de prueba', ubicacion='Edificio A', capacidad=4)
+        reservacion = Reservacion.objects.create(
+            usuario=usuario,
+            sala=sala,
+            fecha=datetime.date(2030, 1, 15),
+            hora_inicio=datetime.time(10, 0),
+            hora_fin=datetime.time(11, 0),
+            asistentes=3,
+            proposito='Estudio para el examen final',
+        )
+        response = self.client.get('/reservaciones/')
+        self.assertNotContains(
+            response, f'/reservaciones/{reservacion.pk}/cancelar/')
+
     def inicia_sesion(self):
         usuario = User.objects.create_user(
             username='estudiante1', password='Prueba12345!')

@@ -59,3 +59,7 @@ class TestModels(RelojFijoMixin, TestCase):
         self.reservacion.proposito = '   corto    '
         with self.assertRaises(ValidationError):
             self.reservacion.full_clean()
+
+    def test_puede_cancelarse_con_mas_de_60_minutos(self):
+        self.reservacion.save()
+        self.assertTrue(self.reservacion.puede_cancelarse())
