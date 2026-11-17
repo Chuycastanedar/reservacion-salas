@@ -22,3 +22,12 @@ Característica: Cancelación de reservaciones
     Cuando consulta su historial
     Entonces observa la reservación de "Sala BDD" con estado "CANCELADA"
     Y puede identificar la fecha y hora de cancelación "ayer 09:15"
+
+  Escenario: CA-08. Impedir que un usuario cancele una reservación ajena
+    Dado que existe una sala activa "Sala BDD" con capacidad para 4 personas
+    Y existe una reservación vigente de "estudiante2" para "Sala BDD" dentro de 2 días de 10:00 a 11:00 con propósito "Asesoría confidencial de tesis"
+    Y el usuario "estudiante1" ha iniciado sesión
+    Cuando intenta cancelarla abriendo la URL de cancelación de esa reservación
+    Entonces ve una página de recurso no encontrado
+    Y la página no muestra el propósito "Asesoría confidencial de tesis"
+    Y al iniciar sesión "estudiante2" su lista muestra la reservación con estado "VIGENTE"
