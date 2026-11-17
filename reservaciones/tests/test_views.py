@@ -374,6 +374,25 @@ class TestViewsCancelar(RelojFijoMixin, TestCase):
         response = self.client.post('/reservaciones/9999/cancelar/')
         self.assertEqual(response.status_code, 404)
 
+    def test_cancelacion_tardia_muestra_mensaje(self):
+        tardia = Reservacion.objects.create(
+            usuario=self.usuario,
+            sala=self.sala,
+            fecha=datetime.date(2030, 1, 15),
+            hora_inicio=datetime.time(9, 30),
+            hora_fin=datetime.time(10, 30),
+            asistentes=3,
+            proposito='Estudio para el examen final',
+        )
+        self.inicia_sesion()
+        self.client.raise_request_exception = False
+        response = self.client.post(
+            f'/reservaciones/{tardia.pk}/cancelar/', follow=True)
+        self.assertContains(
+            response, 'El periodo de cancelación ha concluido.')
+        tardia.refresh_from_db()
+        self.assertEqual(tardia.estado, Reservacion.Estado.VIGENTE)
+
     def inicia_sesion(self):
         self.client.force_login(self.usuario)
 
