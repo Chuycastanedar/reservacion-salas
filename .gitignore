@@ -34,6 +34,8 @@ htmlcov/
 
 # JMeter: resultados crudos (el .jmx, los .csv parametrizados y el reporte HTML SÍ se versionan)
 *.jtl
+# El reporte HTML incluye recursos en carpetas dist/ (ignoradas arriba para Python)
+!evidencias/jmeter/reporte/**/dist/
 
 # Logs (incluye jmeter.log y geckodriver.log)
 *.log
