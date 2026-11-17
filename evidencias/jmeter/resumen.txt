@@ -1,0 +1,25 @@
+Resumen de resultados JMeter — PERF-01 a PERF-03
+Fuente: evidencias/jmeter/reporte/statistics.json (p90 = pct1ResTime, p95 = pct2ResTime)
+Plan: jmeter/reservaciones.jmx · JMeter 5.6.3 · ejecución del 2026-11-17 16:29:42–16:30:50 (America/Mexico_City)
+
+Muestra                    Muestras  Prom (ms)  p90 (ms)  p95 (ms)  Throughput (/s)  % error
+--------------------------------------------------------------------------------------------
+PERF-01 GET login                50        7.6       8.9      12.3             1.71    0.00%
+PERF-01 POST login               50     1457.3    1544.2    1723.8             1.63    0.00%
+PERF-01 GET listado             250       72.2      79.9      81.0             8.73    0.00%
+PERF-02 GET login                30        6.0       6.0       6.9             1.04    0.00%
+PERF-02 POST login               30     1356.6    1383.0    1387.6             0.99    0.00%
+PERF-02 GET formulario           90       32.5      35.0      41.0             3.06    0.00%
+PERF-02 POST reservación         90      132.2     145.0     146.9             3.05    0.00%
+PERF-03 GET login                 5       31.2      37.0      37.0           131.58    0.00%
+PERF-03 POST login                5     1741.2    2132.0    2132.0             2.32    0.00%
+PERF-03 GET formulario           50       77.9     104.9     111.1            15.83    0.00%
+PERF-03 POST reservación         50      144.2     219.8     229.1            19.22    0.00%
+--------------------------------------------------------------------------------------------
+Total                           700      238.5    1355.9    1411.9            10.48    0.00%
+
+Muestras medidas por criterio:
+  PERF-01 GET listado      -> errores < 1 % y p95 <= 1500 ms
+  PERF-02 POST reservación -> errores < 1 % y p95 <= 2000 ms
+  PERF-03                  -> sin reservaciones vigentes traslapadas (ver perf03_consulta_bd.txt)
+Las muestras de inicio de sesión se registran aparte (R-05) y no forman parte de los criterios.

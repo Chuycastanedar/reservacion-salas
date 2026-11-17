@@ -152,17 +152,39 @@ Los archivos con lógica funcional nunca se excluyen: se cubren al 100 %. Las ex
 
 ## Pruebas de rendimiento con JMeter
 
-El plan estará en `jmeter/` junto con el CSV de datos parametrizados. Con la aplicación levantada y los datos iniciales cargados:
+Archivos en `jmeter/`:
+
+- `reservaciones.jmx`: plan con tres grupos que se ejecutan en orden consecutivo (PERF-01, PERF-02, PERF-03). Cada hilo inicia sesión una sola vez con su propio gestor de cookies. Antes de cada POST se extrae el `csrfmiddlewaretoken`, y el id de la sala se toma por su nombre del `<select>` del formulario.
+- `datos_perf02.csv`: datos de PERF-02, con cabecera `sala,dias,hora_inicio,hora_fin,asistentes` y 108 filas únicas (3 salas activas × 6 franjas de 2 h × 6 días). La columna `dias` es un desplazamiento desde hoy y el plan calcula la fecha al ejecutarse, así que el archivo no caduca. PERF-02 consume 90 filas.
+
+PERF-03 envía 5 solicitudes simultáneas (temporizador de sincronización) para "Sala C", 10:00–11:00, en 10 fechas distintas (hoy + 10 a hoy + 19 días). Son 10 conflictos controlados en los que cada respuesta debe ser "registrada" o "no disponible".
+
+Variables configurables con `-J`: `host`, `puerto`, `usuario`, `clave` (por defecto `localhost`, `8000`, `estudiante1`, `Prueba12345!`) y, por grupo, `perf01.hilos`, `perf01.subida`, `perf01.iteraciones` (y lo mismo con `perf02.` y `perf03.`). Sus valores por defecto son los del spec.
+
+### Preparación de datos
+
+1. Aplicación levantada, con `migrate` (salas iniciales) y `crear_usuarios_prueba` aplicados.
+2. **Tabla de reservaciones vacía.** PERF-02 y PERF-03 usan salas, fechas y horarios concretos, así que cualquier reservación previa provocaría rechazos por traslape y mezclaría datos en la consulta de PERF-03. El comando siguiente borra **todas** las reservaciones de la base de desarrollo (salas y usuarios se conservan). Ejecútalo solo después de revisar el conteo:
+
+   ```bash
+   docker compose exec -T db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT count(*) FROM reservaciones_reservacion;"'
+   docker compose exec -T db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "TRUNCATE TABLE reservaciones_reservacion RESTART IDENTITY;"'
+   ```
+
+3. No crear reservaciones a mano mientras dure la carga.
+
+### Ejecución
 
 ```bash
+rm -rf evidencias/jmeter/reporte evidencias/jmeter/resultados.jtl
 jmeter -n -t jmeter/reservaciones.jmx \
   -l evidencias/jmeter/resultados.jtl \
   -e -o evidencias/jmeter/reporte
 ```
 
-(La carpeta `evidencias/jmeter/reporte` debe no existir o estar vacía antes de ejecutar.)
+(La carpeta `evidencias/jmeter/reporte` debe no existir o estar vacía antes de ejecutar.) Para una prueba de humo con carga mínima basta cambiar propiedades, por ejemplo `-Jperf01.hilos=1 -Jperf02.hilos=1 -Jperf03.iteraciones=1`. La prueba de humo deja reservaciones, así que hay que vaciar la tabla otra vez antes de la ejecución completa.
 
-El archivo `resultados.jtl` contiene los resultados crudos y no se versiona. El entregable es el reporte HTML de `evidencias/jmeter/reporte`.
+El archivo `resultados.jtl` contiene los resultados crudos y no se versiona. Los entregables están en `evidencias/jmeter/`: el reporte HTML (`reporte/`), el resumen por muestra (`resumen.txt`), la interpretación (`interpretacion.md`), el conteo previo (`tabla_vacia_antes.txt`) y la consulta de PERF-03 (`perf03_consulta_bd.txt`).
 
 | ID | Flujo | Carga | Criterio |
 | --- | --- | --- | --- |
@@ -170,10 +192,10 @@ El archivo `resultados.jtl` contiene los resultados crudos y no se versiona. El 
 | PERF-02 | Registro de reservaciones sin conflicto | 30 usuarios, 30 s de subida, 3 iteraciones | Errores < 1 %; p95 ≤ 2000 ms |
 | PERF-03 | Control de concurrencia | Al menos 10 repeticiones del mismo conflicto | Nunca dos reservaciones vigentes traslapadas |
 
-Para la evidencia de PERF-03, esta consulta debe devolver **cero filas** después de la prueba (no debe haber pares de reservaciones vigentes traslapadas en la misma sala). Los nombres de tabla y columnas son provisionales y se ajustarán cuando se definan los modelos:
+Para la evidencia de PERF-03, esta consulta debe devolver **cero filas** después de la prueba (no debe haber pares de reservaciones vigentes traslapadas en la misma sala). Además debe haber exactamente 10 reservaciones vigentes en las fechas de PERF-03, una por conflicto:
 
 ```bash
-docker compose exec db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "
+docker compose exec -T db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "
 SELECT a.id, b.id, a.sala_id, a.fecha, a.hora_inicio, a.hora_fin
 FROM reservaciones_reservacion a
 JOIN reservaciones_reservacion b
