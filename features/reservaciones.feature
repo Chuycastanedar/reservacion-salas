@@ -34,3 +34,12 @@ Característica: Registro de reservaciones de salas
       | fecha  | inicio | fin   | mensaje                                                |
       | ayer   | 10:00  | 11:00 | La fecha no puede ser anterior al día actual.          |
       | mañana | 11:00  | 10:00 | La hora de fin debe ser posterior a la hora de inicio. |
+
+  Escenario: CA-05. Rechazar una sala inactiva
+    Dado que existe una sala activa "Sala en revisión" con capacidad para 6 personas
+    Y el usuario "estudiante1" ha iniciado sesión
+    Y tiene abierto el formulario de nueva reservación
+    Y la sala "Sala en revisión" fue marcada como inactiva
+    Cuando intenta registrar una reservación válida para "Sala en revisión"
+    Entonces ve el mensaje "La sala no se encuentra disponible para reservación."
+    Y su lista no muestra ninguna reservación

@@ -36,6 +36,11 @@ def paso_sala_activa(context, nombre, capacidad):
     )
 
 
+@given('la sala "{nombre}" fue marcada como inactiva')
+def paso_sala_inactiva(context, nombre):
+    Sala.objects.filter(nombre=nombre).update(activa=False)
+
+
 @given('no existe otra reservación vigente para "{nombre}" mañana')
 def paso_sin_reservaciones(context, nombre):
     Reservacion.objects.filter(
@@ -45,6 +50,7 @@ def paso_sin_reservaciones(context, nombre):
     ).delete()
 
 
+@given('tiene abierto el formulario de nueva reservación')
 @when('abre el formulario de nueva reservación')
 def paso_abre_formulario(context):
     enlaces = context.browser.find_elements(By.ID, "enlace-nueva")
@@ -74,7 +80,7 @@ def paso_envia_formulario(context):
 
 
 def registrar_reservacion(context, sala, fecha, inicio, fin, asistentes,
-                          proposito=PROPOSITO_VALIDO):
+                          proposito=PROPOSITO_VALIDO, abrir=True):
     context.capturado = {
         "fecha": fecha.isoformat(),
         "hora_inicio": inicio,
@@ -82,7 +88,8 @@ def registrar_reservacion(context, sala, fecha, inicio, fin, asistentes,
         "asistentes": str(asistentes),
         "proposito": proposito,
     }
-    paso_abre_formulario(context)
+    if abrir:
+        paso_abre_formulario(context)
     browser = context.browser
     seleccionar_sala(browser, sala)
     context.capturado["sala"] = sala
@@ -98,6 +105,12 @@ def registrar_reservacion(context, sala, fecha, inicio, fin, asistentes,
 def paso_intenta_registrar_con_asistentes(context, sala, asistentes):
     registrar_reservacion(
         context, sala, manana(), "10:00", "11:00", asistentes)
+
+
+@when('intenta registrar una reservación válida para "{sala}"')
+def paso_intenta_registrar_en_formulario_abierto(context, sala):
+    registrar_reservacion(
+        context, sala, manana(), "10:00", "11:00", 3, abrir=False)
 
 
 @when('intenta registrar una reservación para "{sala}" '
