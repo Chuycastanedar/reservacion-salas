@@ -207,3 +207,8 @@ class TestCancelarReservacion(RelojFijoMixin, TestCase):
         self.assertEqual(
             Reservacion.objects.first().estado,
             Reservacion.Estado.CANCELADA)
+
+    def test_cancelacion_registra_fecha_y_hora(self):
+        cancelar_reservacion(self.reservacion, self.usuario, ahora=AHORA)
+        self.assertEqual(
+            Reservacion.objects.first().fecha_cancelacion, AHORA)
