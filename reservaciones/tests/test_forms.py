@@ -170,3 +170,15 @@ class TestFormReservacion(RelojFijoMixin, TestCase):
         self.data['asistentes'] = 1
         form = ReservacionForm(self.data)
         self.assertTrue(form.is_valid())
+
+    def test_asistentes_texto(self):
+        self.data['asistentes'] = 'cinco'
+        form = ReservacionForm(self.data)
+        self.assertFalse(form.is_valid())
+
+    def test_asistentes_texto_mensaje(self):
+        self.data['asistentes'] = 'cinco'
+        form = ReservacionForm(self.data)
+        self.assertEqual(form.errors['asistentes'], [
+                         'El número de asistentes debe ser un número '
+                         'entero.'])
