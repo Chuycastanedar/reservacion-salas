@@ -2,6 +2,15 @@
 
 Un registro por ciclo: prueba fallida, código mínimo, prueba exitosa y refactorización.
 
+## Convenciones
+
+- **ID de la prueba.** Es el identificador del spec (`UT-08`, `CA-02`…). Cuando un ID abarca varios casos, se hace un ciclo por caso y se agrega un sufijo (`UT-08a_parcial`, `UT-08b_contenido`). Las pruebas sin ID en el spec (`__str__`, migración de datos, comando de gestión, ramas adicionales) usan `EXTRA-<descripción>`.
+- **Rojo.** Commit `test: …` con la prueba nueva y `evidencias/tdd/<ID>_rojo.txt`: la ejecución de esa prueba, que falla por aserción (`FAIL` / `AssertionError`) y no por error de importación.
+- **Verde.** Commit `feat: …` (o `fix: …`) con el código mínimo y `evidencias/tdd/<ID>_verde.txt`: la ejecución de la suite completa en verde.
+- **Refactorización.** Si la hubo, commit `refactor: …` con `evidencias/tdd/<ID>_refactor.txt` (suite completa); si no, se indica "Sin refactorización". La fila de cada ciclo se registra en el commit siguiente al verde (el de refactorización o un `docs: actualiza bitácora TDD (<ID>)`), porque un commit no puede contener su propio hash.
+- **Prueba de confirmación.** Una prueba que pasa a la primera porque el comportamiento ya existe (por ejemplo, la protección CSRF que aplica Django). No se fabrica un rojo: se verifica a mano que la prueba falla si se rompe el código (sin commitear la rotura) y se registra con "Sin fase roja", indicando qué ciclo previo la cubre.
+- Los hashes son cortos (7 caracteres) y corresponden a commits de la rama `main`, fusionada siempre con *merge commit*.
+
 | # | Fecha | Prueba (ID) | Comportamiento | Rojo (commit y evidencia) | Verde (commit y evidencia) | Refactorización |
 |---|-------|-------------|----------------|---------------------------|----------------------------|-----------------|
 | 1 | 2026-11-16 | UT-01a_modelo | Una reservación nueva queda en estado VIGENTE | `b76fe84` · `evidencias/tdd/UT-01a_modelo_rojo.txt` | `d2c0bd9` · `evidencias/tdd/UT-01a_modelo_verde.txt` | Sin refactorización |
@@ -67,3 +76,4 @@ Un registro por ciclo: prueba fallida, código mínimo, prueba exitosa y refacto
 | 61 | 2026-11-17 | UT-17 | El servicio rechaza una segunda cancelación y conserva la fecha de la primera (RN-10) | `8461a4a` · `evidencias/tdd/UT-17_rojo.txt` | `50fe72e` · `evidencias/tdd/UT-17_verde.txt` | Sin refactorización |
 | 62 | 2026-11-17 | EXTRA-accion-oculta-a_cancelada | La lista no ofrece cancelar una reservación ya cancelada; la plantilla consulta Reservacion.puede_cancelarse() | `59c20a1` · `evidencias/tdd/EXTRA-accion-oculta-a_cancelada_rojo.txt` | `193fd95` · `evidencias/tdd/EXTRA-accion-oculta-a_cancelada_verde.txt` | Sin refactorización |
 | 63 | 2026-11-17 | EXTRA-accion-oculta-b_tardia | La lista no ofrece cancelar cuando faltan 60 minutos o menos para el inicio; puede_cancelarse() incorpora la anticipación | `3e26b8f` · `evidencias/tdd/EXTRA-accion-oculta-b_tardia_rojo.txt` | `a4f7fc0` · `evidencias/tdd/EXTRA-accion-oculta-b_tardia_verde.txt` | Reglas de estado y anticipación en métodos de dominio de `Reservacion` reutilizados por `cancelar_reservacion` · `evidencias/tdd/EXTRA-accion-oculta-b_tardia_refactor.txt` |
+| 64 | 2026-11-17 | EXTRA-csrf-confirmacion | Con verificación CSRF estricta, los POST de alta y de cancelación sin token responden 403 y no modifican datos (RT-12) | Sin fase roja: prueba de confirmación, cubierto por EXTRA-nueva-formulario y EXTRA-cancelar-confirmacion (la protección la aplica `CsrfViewMiddleware`; verificada desactivándolo temporalmente: `302 != 403`) | `68de0c3` · `evidencias/tdd/EXTRA-csrf-confirmacion_verde.txt` | Sin refactorización |
